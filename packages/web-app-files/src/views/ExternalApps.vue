@@ -75,7 +75,7 @@ export default {
         if (data && data.app_url) this.app_url = data.app_url
         if (data && data.method) this.method = data.method
         if (data && data.form_parameters) this.form_parameters = data.form_parameters
-        if (this.app_url && this.method) this.loading = false
+        if ((this.app_url && this.method) || !data) this.loading = false
         console.log('post data', data)
       })
       .catch(err => {
