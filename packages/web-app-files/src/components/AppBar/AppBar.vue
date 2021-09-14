@@ -93,6 +93,18 @@
                     </oc-button>
                   </div>
                 </li>
+                <li
+                  v-for="mimetype in mimetypes"
+                  :key="mimetype"
+                  @click="showCreateFileModal(mimetype)"
+                >
+                  <div>
+                    <oc-button appearance="raw" justify-content="left">
+                      <oc-icon :name="'file'" />
+                      <span>{{ 'New ' + mimetype.name || mimetype.extension + ' document' }}</span>
+                    </oc-button>
+                  </div>
+                </li>
               </ul>
             </oc-drop>
           </template>
@@ -133,7 +145,59 @@ export default {
   data: () => ({
     newFileAction: null,
     path: '',
-    fileFolderCreationLoading: false
+    fileFolderCreationLoading: false,
+    mimetypes: {
+      'application/msword': {
+        name: 'Word document',
+        extension: '.docx',
+        app_providers: [
+          {
+            address: 'localhost:19000',
+            name: 'Collabora',
+            icon: 'https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png'
+          },
+          {
+            address: 'localhost:18000',
+            name: 'MS Office 365',
+            icon:
+              'https://upload.wikimedia.org/wikipedia/commons/5/5f/Microsoft_Office_logo_%282019%E2%80%93present%29.svg'
+          }
+        ]
+      },
+      'application/vnd.sun.xml.calc.template': {
+        name: 'CALC document',
+        extension: 'calc',
+        app_providers: [
+          {
+            address: 'localhost:19000',
+            name: 'Collabora',
+            icon: 'https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png'
+          }
+        ]
+      },
+      'application/vnd.sun.xml.draw': {
+        name: 'Draw document',
+        extension: '.drawio',
+        app_providers: [
+          {
+            address: 'localhost:19000',
+            name: 'Collabora',
+            icon: 'https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png'
+          }
+        ]
+      },
+      'application/vnd.sun.xml.draw.template': {
+        name: 'XML',
+        extension: '.xml',
+        app_providers: [
+          {
+            address: 'localhost:19000',
+            name: 'Collabora',
+            icon: 'https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png'
+          }
+        ]
+      }
+    }
   }),
   computed: {
     ...mapGetters(['getToken', 'configuration', 'newFileHandlers', 'quota', 'user']),
@@ -300,6 +364,27 @@ export default {
           : this.checkNewFileName(defaultName),
         onCancel: this.hideModal,
         onConfirm: isFolder ? this.addNewFolder : this.addNewFile,
+        onInput: checkInputValue
+      }
+      this.createModal(modal)
+    },
+
+    showCreateFileModal(mimetype) {
+      const defaultName = this.$gettext('New file') + '.' + mimetype.extension
+      const checkInputValue = value => {
+        this.setModalInputErrorMessage(this.checkNewFileName(value))
+      }
+      const modal = {
+        variation: 'passive',
+        title: this.$gettext('Create a new file'),
+        cancelText: this.$gettext('Cancel'),
+        confirmText: this.$gettext('Create'),
+        hasInput: true,
+        inputValue: defaultName,
+        inputLabel: this.$gettext('File name'),
+        inputError: this.checkNewFileName(defaultName),
+        onCancel: this.hideModal,
+        onConfirm: this.addNewFile,
         onInput: checkInputValue
       }
       this.createModal(modal)
