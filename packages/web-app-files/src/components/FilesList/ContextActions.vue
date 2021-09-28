@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div id="oc-files-context-menu">
     <ul
       v-if="showExternalApps"
@@ -23,6 +24,24 @@
         :key="`section-${section.name}-list`"
         class="uk-list oc-mt-s oc-files-context-actions"
       >
+=======
+  <div>
+    <ul
+      v-if="item.extension && appList.length > 0"
+      id="oc-files-context-actions"
+      class="uk-list oc-mt-s"
+    >
+      <li v-for="(app, index) in appList" :key="`app-${index}`" class="oc-py-xs pointer">
+        <div :class="['oc-text-bold']" @click="openLink(app)">
+          <img :src="app.icon" :alt="app.name" class="oc-icon-m" />
+          <span class="oc-files-context-action-label">{{ 'Open in ' + app.name }}</span>
+        </div>
+      </li>
+    </ul>
+    <hr :key="`section-external-apps-separator`" />
+    <ul id="oc-files-context-actions" class="uk-list oc-mt-s">
+      <template v-for="(section, i) in menuSections">
+>>>>>>> External apps
         <li
           v-for="(action, j) in section.items"
           :key="`section-${section.name}-action-${j}`"
@@ -43,9 +62,15 @@
             />
           </component>
         </li>
+<<<<<<< HEAD
       </ul>
       <hr v-if="i < menuSections.length - 1" :key="`section-${section.name}-separator`" />
     </template>
+=======
+        <hr v-if="i < menuSections.length - 1" :key="`section-${section.name}-separator`" />
+      </template>
+    </ul>
+>>>>>>> External apps
   </div>
 </template>
 
@@ -100,11 +125,23 @@ export default {
 
   computed: {
     ...mapGetters('Files', ['currentFolder']),
+<<<<<<< HEAD
 
     showExternalApps() {
       return this.item.extension && this.appList?.length > 0
     },
 
+=======
+    actions() {
+      const actions = this.$_fileActions_editorActions.concat(this.$_fileActions_systemActions)
+      return actions.filter(action =>
+        action.isEnabled({
+          resource: this.highlightedFile,
+          parent: this.currentFolder
+        })
+      )
+    },
+>>>>>>> External apps
     menuSections() {
       const sections = []
       if (this.menuItemsContext.length) {
@@ -183,12 +220,30 @@ export default {
       return [...this.$_showDetails_items].filter(item => item.isEnabled(this.filterParams))
     }
   },
+<<<<<<< HEAD
   mounted() {
     this.loadApps()
   },
   methods: {
     loadApps() {
       this.appList = this.$_fileActions_loadApps(this.item)
+=======
+  watch: {
+    item(val, oldVal) {
+      // is triggered whenever the store state changes
+      this.loadApps()
+    }
+  },
+  created() {
+    this.loadApps()
+  },
+  methods: {
+    openLink(app) {
+      this.$_fileActions_openLink(app, this.item)
+    },
+    async loadApps() {
+      return await this.$_fileActions_loadApps(this.item)
+>>>>>>> External apps
     },
     getComponentProps(action, resource) {
       if (action.componentType === 'router-link' && action.route) {
