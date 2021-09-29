@@ -140,6 +140,7 @@ export default {
     // returns the _first_ action from actions array which we now construct from
     // available mime-types coming from the app-provider and existing actions
     $_fileActions_triggerDefaultAction(resource) {
+<<<<<<< HEAD
       const availableExternalAppActions = this.$_fileActions_loadApps(resource)
 
       for (const action of availableExternalAppActions) {
@@ -180,6 +181,60 @@ export default {
           return []
         }
       }
+=======
+      if (
+        resource.extension === 'pdf' ||
+        resource.extension === 'drawio' ||
+        resource.extension === 'root' ||
+        resource.extension === 'png' ||
+        resource.extension === 'jpg' ||
+        resource.extension === 'gif'
+      ) {
+        let actions = this.$_fileActions_editorActions.concat(this.$_fileActions_systemActions)
+
+        actions = actions.filter(action => {
+          return (
+            action.isEnabled({
+              resource: resource,
+              parent: this.currentFolder
+            }) && action.canBeDefault
+          )
+        })
+        actions[0].handler(resource, actions[0].handlerData)
+      } else {
+        this.$_fileActions_loadApps(resource).then(res => {
+          if (res) {
+            this.$_fileActions_openLink(res[0], resource)
+          }
+        })
+      }
+    },
+
+    async $_fileActions_loadApps(resource) {
+      const data = JSON.parse(localStorage.mimetypes)
+      const url = 'remote.php/dav/files/' + this.user.id + resource.path
+      const headers = new Headers()
+      headers.append('Authorization', 'Bearer ' + this.getToken)
+      headers.append('X-Requested-With', 'XMLHttpRequest')
+      const resp = await fetch(url, { method: 'PROPFIND', headers })
+      if (!resp.ok) {
+        const message = `An error has occured: ${resp.status}`
+        throw new Error(message)
+      }
+      const prop = await resp.text()
+      const a = prop.match(new RegExp('<d:getcontenttype>' + '(.*)' + '</d:getcontenttype>'))
+      const mimetype = a[0].split('<d:getcontenttype>')[1].split('</d:getcontenttype>')[0]
+
+      const appprovider = data['mime-types'].filter(p => p.mime_type === mimetype)
+
+      if (appprovider[0] && appprovider[0].app_providers)
+        this.appList = appprovider[0].app_providers
+      else {
+        this.appList = []
+        return null
+      }
+      return appprovider[0].app_providers
+>>>>>>> R1 (#57)
     },
 
     $_fileActions_openLink(appName, resourceId) {
