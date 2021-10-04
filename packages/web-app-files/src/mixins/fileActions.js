@@ -140,48 +140,6 @@ export default {
     // returns the _first_ action from actions array which we now construct from
     // available mime-types coming from the app-provider and existing actions
     $_fileActions_triggerDefaultAction(resource) {
-<<<<<<< HEAD
-      const availableExternalAppActions = this.$_fileActions_loadApps(resource)
-
-      for (const action of availableExternalAppActions) {
-        action.handler = () => this.$_fileActions_openLink(action.name, resource.fileId)
-      }
-
-      let actions = this.$_fileActions_editorActions.concat(this.$_fileActions_systemActions)
-
-      actions = actions.filter(action => {
-        return (
-          action.isEnabled({
-            resource: resource,
-            parent: this.currentFolder
-          }) && action.canBeDefault
-        )
-      })
-
-      const allDefaultActions = availableExternalAppActions.concat(actions)
-      allDefaultActions[0].handler(resource, allDefaultActions[0].handlerData)
-    },
-
-    // returns an array of available external Apps
-    // to open a resource with a specific mimeType
-    $_fileActions_loadApps(resource) {
-      const { mimeType } = resource
-      if (mimeType === undefined || !this.capabilities.files.app_providers) {
-        return []
-      }
-      const allAvailableMimeTypes = this.getMimeTypes()
-
-      if (!allAvailableMimeTypes?.length) {
-        return []
-      } else {
-        const availableMimeTypes = allAvailableMimeTypes.find(t => t.mime_type === mimeType)
-        if (availableMimeTypes) {
-          return availableMimeTypes.app_providers
-        } else {
-          return []
-        }
-      }
-=======
       if (
         resource.extension === 'pdf' ||
         resource.extension === 'drawio' ||
@@ -234,7 +192,6 @@ export default {
         return null
       }
       return appprovider[0].app_providers
->>>>>>> R1 (#57)
     },
 
     $_fileActions_openLink(appName, resourceId) {

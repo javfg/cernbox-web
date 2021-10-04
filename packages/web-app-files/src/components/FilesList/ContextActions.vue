@@ -1,30 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div id="oc-files-context-menu">
-    <ul
-      v-if="showExternalApps"
-      id="oc-files-context-default-actions"
-      class="uk-list oc-my-xs oc-files-context-actions"
-    >
-      <li v-for="(app, index) in appList" :key="`app-${index}`">
-        <oc-button
-          appearance="raw"
-          class="oc-text-bold"
-          @click="$_fileActions_openLink(app.name, item.id)"
-        >
-          <img :src="app.icon" :alt="`Icon for ${app.name} app`" class="oc-icon oc-icon-m" />
-          <span class="oc-files-context-action-label">{{ 'Open in ' + app.name }}</span>
-        </oc-button>
-      </li>
-    </ul>
-    <hr v-if="showExternalApps" />
-    <template v-for="(section, i) in menuSections">
-      <ul
-        id="`oc-files-context-actions-${section.name}`"
-        :key="`section-${section.name}-list`"
-        class="uk-list oc-mt-s oc-files-context-actions"
-      >
-=======
   <div>
     <ul
       v-if="item.extension && appList.length > 0"
@@ -41,7 +15,6 @@
     <hr :key="`section-external-apps-separator`" />
     <ul id="oc-files-context-actions" class="uk-list oc-mt-s">
       <template v-for="(section, i) in menuSections">
->>>>>>> External apps
         <li
           v-for="(action, j) in section.items"
           :key="`section-${section.name}-action-${j}`"
@@ -62,15 +35,9 @@
             />
           </component>
         </li>
-<<<<<<< HEAD
-      </ul>
-      <hr v-if="i < menuSections.length - 1" :key="`section-${section.name}-separator`" />
-    </template>
-=======
         <hr v-if="i < menuSections.length - 1" :key="`section-${section.name}-separator`" />
       </template>
     </ul>
->>>>>>> External apps
   </div>
 </template>
 
@@ -125,13 +92,6 @@ export default {
 
   computed: {
     ...mapGetters('Files', ['currentFolder']),
-<<<<<<< HEAD
-
-    showExternalApps() {
-      return this.item.extension && this.appList?.length > 0
-    },
-
-=======
     actions() {
       const actions = this.$_fileActions_editorActions.concat(this.$_fileActions_systemActions)
       return actions.filter(action =>
@@ -141,7 +101,6 @@ export default {
         })
       )
     },
->>>>>>> External apps
     menuSections() {
       const sections = []
       if (this.menuItemsContext.length) {
@@ -220,14 +179,6 @@ export default {
       return [...this.$_showDetails_items].filter(item => item.isEnabled(this.filterParams))
     }
   },
-<<<<<<< HEAD
-  mounted() {
-    this.loadApps()
-  },
-  methods: {
-    loadApps() {
-      this.appList = this.$_fileActions_loadApps(this.item)
-=======
   watch: {
     item(val, oldVal) {
       // is triggered whenever the store state changes
@@ -243,7 +194,6 @@ export default {
     },
     async loadApps() {
       return await this.$_fileActions_loadApps(this.item)
->>>>>>> External apps
     },
     getComponentProps(action, resource) {
       if (action.componentType === 'router-link' && action.route) {
