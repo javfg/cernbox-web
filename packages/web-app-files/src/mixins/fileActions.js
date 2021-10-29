@@ -66,33 +66,42 @@ export default {
     },
 
     $_fileActions_editorActions() {
-      return this.apps.fileEditors.map((editor) => {
-        return {
-          label: () => {
-            const translated = this.$gettext('Open in %{app}')
-            return this.$gettextInterpolate(
-              translated,
-              { app: this.apps.meta[editor.app].name },
-              true
-            )
-          },
-          icon: this.apps.meta[editor.app].icon,
-          handler: (item) =>
-            this.$_fileActions_openEditor(editor, item.path, item.id, EDITOR_MODE_EDIT),
-          isEnabled: ({ resource }) => {
-            if (editor.routes?.length > 0 && !checkRoute(editor.routes, this.$route.name)) {
-              return false
-            }
+      return this.apps.fileEditors
+        .map((editor) => {
+          return {
+            label: () => {
+              const translated = this.$gettext('Open in %{app}')
+              return this.$gettextInterpolate(
+                translated,
+                { app: this.apps.meta[editor.app].name },
+                true
+              )
+            },
+            icon: this.apps.meta[editor.app].icon,
+            img: this.apps.meta[editor.app].img,
+            handler: (item) =>
+              this.$_fileActions_openEditor(editor, item.path, item.id, EDITOR_MODE_EDIT),
+            isEnabled: ({ resource }) => {
+              if (editor.routes?.length > 0 && !checkRoute(editor.routes, this.$route.name)) {
+                return false
+              }
 
-            return resource.extension === editor.extension
-          },
-          canBeDefault: true,
-          componentType: 'oc-button',
-          class: `oc-files-actions-${kebabCase(
-            this.apps.meta[editor.app].name
-          ).toLowerCase()}-trigger`
-        }
-      })
+              return resource.extension === editor.extension
+            },
+            canBeDefault: editor.canBeDefault,
+            componentType: 'oc-button',
+            class: `oc-files-actions-${kebabCase(
+              this.apps.meta[editor.app].name
+            ).toLowerCase()}-trigger`
+          }
+        })
+        .sort((first, second) => {
+          // We make the default action based on the order, so put the ones who can be default on top
+          if (second.canBeDefault !== first.canBeDefault && second.canBeDefault) {
+            return 1
+          }
+          return 0
+        })
     }
   },
 
@@ -203,7 +212,8 @@ export default {
         const label = this.$gettext('Open in %{ appName }')
         return {
           name: app.name,
-          img: app.icon,
+          icon: app.icon,
+          img: app.img,
           componentType: 'oc-button',
           class: `oc-files-actions-${app.name}-trigger`,
           isEnabled: () => true,

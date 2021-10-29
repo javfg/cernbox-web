@@ -17,7 +17,7 @@
             :class="['oc-text-bold', action.class]"
             v-on="getComponentListeners(action, item)"
           >
-            <oc-icon v-if="action.icon" :name="action.icon" size="medium" />
+            <oc-icon v-if="action.icon && !action.img" :name="action.icon" size="medium" />
             <oc-img v-if="action.img" :src="action.img" alt="" class="oc-icon oc-icon-m" />
             <span class="oc-files-context-action-label">{{ action.label(item) }}</span>
             <span
