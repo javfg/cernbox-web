@@ -24,6 +24,8 @@ import ts from 'rollup-plugin-ts'
 const production = !process.env.ROLLUP_WATCH
 const sourcemap = process.env.SOURCE_MAP === 'true'
 
+const compilationTimestamp = new Date().getTime()
+
 const plugins = [
   del({
     runOnce: true,
@@ -115,6 +117,7 @@ const plugins = [
               makeHtmlAttributes: html.makeHtmlAttributes
             },
             data: {
+              compilationTimestamp: compilationTimestamp,
               attributes,
               meta,
               publicPath,
