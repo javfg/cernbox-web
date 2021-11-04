@@ -4,7 +4,7 @@ export function initVueAuthenticate(config) {
   if (config) {
     const store = new WebStorageStateStore({
       prefix: 'oc_oAuth',
-      store: localStorage
+      store: sessionStorage
     })
     let baseUrl = window.location.href.split('#')[0]
     if (baseUrl.endsWith('/index.html')) {
@@ -70,7 +70,7 @@ export function initVueAuthenticate(config) {
         return mgr.signinRedirect()
       },
       getToken() {
-        const storageString = localStorage.getItem('oc_oAuth' + mgr._userStoreKey)
+        const storageString = sessionStorage.getItem('oc_oAuth' + mgr._userStoreKey)
         if (storageString) {
           const user = User.fromStorageString(storageString)
           if (user) {
@@ -81,7 +81,7 @@ export function initVueAuthenticate(config) {
         return null
       },
       getStoredUserObject() {
-        const storageString = localStorage.getItem('oc_oAuth' + mgr._userStoreKey)
+        const storageString = sessionStorage.getItem('oc_oAuth' + mgr._userStoreKey)
         if (storageString) {
           const user = User.fromStorageString(storageString)
           if (user) {
