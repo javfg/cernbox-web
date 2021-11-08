@@ -125,7 +125,8 @@ export default {
   userReady({ store }) {
     archiverService.initialize(
       store.getters.configuration.server || window.location.origin,
-      get(store, 'getters.capabilities.files.archivers', [])
+      get(store, 'getters.capabilities.files.archivers', []),
+      get(store, 'getters.capabilities.core.support-url-signing', true)
     )
     // FIXME: Remove mock data
     thumbnailService.initialize(
