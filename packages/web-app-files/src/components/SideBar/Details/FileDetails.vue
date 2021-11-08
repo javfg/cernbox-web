@@ -97,6 +97,57 @@
             />
           </td>
         </tr>
+        <tr>
+          <!-- TODO FIX ME -->
+          <th scope="col" class="oc-pr-s">EOS Path:</th>
+          <td>
+            <div class="oc-text-truncate cern-shortcuts">
+              <span v-oc-tooltip="file.path" class="oc-files-file-link-url">{{ file.path }}</span>
+            </div>
+            <copy-to-clipboard-button
+              class="oc-files-public-link-copy-url oc-ml-xs"
+              :value="file.path"
+              label="Copy EOS path"
+              success-msg-title="Link copy"
+              success-msg-text="The EOS path has been copied to your clipboard."
+            />
+          </td>
+        </tr>
+        <tr>
+          <!-- TODO FIX ME -->
+          <th scope="col" class="oc-pr-s">Direct link:</th>
+          <td>
+            <div class="oc-text-truncate cern-shortcuts">
+              <span v-oc-tooltip="directLink" class="oc-files-file-link-url">{{ directLink }}</span>
+            </div>
+            <copy-to-clipboard-button
+              class="oc-files-public-link-copy-url oc-ml-xs"
+              :value="directLink"
+              label="Copy direct link"
+              success-msg-title="Link copy"
+              success-msg-text="The link has been copied to your clipboard."
+            />
+          </td>
+        </tr>
+        <tr v-if="hasSharees">
+          <th scope="col" class="oc-pr-s" v-text="sharedWithLabel" />
+          <td>
+            <oc-button
+              v-oc-tooltip="sharedWithTooltip"
+              data-testid="collaborators-show-people"
+              appearance="raw"
+              :aria-label="sharedWithTooltip"
+              @click="expandPeoplesPanel"
+            >
+              <oc-avatars
+                :items="collaboratorsAvatar"
+                :stacked="true"
+                :is-tooltip-displayed="false"
+                class="sharee-avatars"
+              />
+            </oc-button>
+          </td>
+        </tr>
       </table>
     </div>
     <p v-else data-testid="noContentText" v-text="noContentText" />
@@ -113,9 +164,12 @@ import upperFirst from 'lodash-es/upperFirst'
 import path from 'path'
 import { createLocationSpaces, isAuthenticatedRoute } from '../../../router'
 import { ShareTypes } from '../../../helpers/share'
+import { encodePath } from 'web-pkg/src/utils'
+import CopyToClipboardButton from '../Links/CopyToClipboardButton.vue' // CERN
 
 export default {
   name: 'FileDetails',
+  components: { CopyToClipboardButton }, // CERN
   mixins: [Mixins, MixinResources],
 
   inject: ['displayedItem'],
@@ -145,7 +199,12 @@ export default {
     sharedItem: null
   }),
   computed: {
-    ...mapGetters('Files', ['versions', 'sharesTree', 'sharesTreeLoading']),
+    ...mapGetters('Files', [
+      'versions',
+      'sharesTree',
+      'sharesTreeLoading',
+      'currentFileOutgoingCollaborators'
+    ]),
     ...mapGetters(['user', 'getToken', 'configuration']),
 
     file() {
@@ -234,6 +293,9 @@ export default {
     },
     ownerAdditionalInfo() {
       return this.file.owner?.[0].additionalInfo
+    },
+    directLink() {
+      return `${this.configuration.server}/#/files/list/all${encodePath(this.file.path)}`
     },
     showSize() {
       return this.getResourceSize(this.file.size) !== '?'
@@ -403,5 +465,13 @@ export default {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+.cern-shortcuts {
+  display: inline-block;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* direction: rtl; */
 }
 </style>
