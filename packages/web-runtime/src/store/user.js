@@ -116,7 +116,8 @@ const actions = {
           email: !Object.keys(login.email).length ? '' : login.email,
           token,
           isAuthenticated: true,
-          groups: userGroups
+          groups: userGroups,
+          usertype: user.usertype
         })
 
         // Display quota in the sidebar
@@ -241,6 +242,7 @@ const mutations = {
     state.isAuthenticated = user.isAuthenticated
     state.token = user.token
     state.groups = user.groups
+    state.usertype = user.usertype
   },
   SET_CAPABILITIES(state, data) {
     state.capabilities = data.capabilities
