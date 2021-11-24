@@ -44,6 +44,9 @@
               </oc-button>
             </div>
           </template>
+          <template #contextMenu="{ resource }">
+            <context-actions v-if="isHighlightedFile(resource)" :item="resource" />
+          </template>
         </oc-table-files>
       </div>
     </template>
@@ -64,10 +67,13 @@ import { VisibilityObserver } from 'web-pkg/src/observer'
 import { ImageDimension } from '../constants'
 import debounce from 'lodash-es/debounce'
 
+import ContextActions from '../components/FilesList/ContextActions.vue'
+import Pagination from '../components/FilesList/Pagination.vue'
+
 const visibilityObserver = new VisibilityObserver()
 
 export default {
-  components: { ListLoader, NoContentMessage },
+  components: { ListLoader, NoContentMessage, Pagination, ContextActions },
 
   mixins: [FileActions, MixinFilesListPositioning, MixinFilesListPagination],
 
@@ -182,7 +188,7 @@ export default {
     async loadResources() {
       this.loading = true
       this.CLEAR_CURRENT_FILES_LIST()
-      const headers = new Headers()
+      /* const headers = new Headers()
       headers.append('Authorization', 'Bearer ' + this.getToken)
       headers.append('X-Requested-With', 'XMLHttpRequest')
 
@@ -195,7 +201,57 @@ export default {
         throw new Error(message)
       }
 
-      const data = await response.json()
+      const data = await response.json() */
+
+      const data = {
+        projects: [
+          {
+            name: 'cboxmacwin',
+            path: '/eos/project/c/cboxmacwin',
+            permissions: 'admin'
+          },
+          {
+            name: 'cern-organization',
+            path: '/eos/project/c/cern-organization',
+            permissions: 'admin'
+          },
+          {
+            name: 'cernbox',
+            path: '/eos/project/c/cernbox',
+            permissions: 'admin'
+          },
+          {
+            name: 'cernbox-staging-web',
+            path: '/eos/project/c/cernbox-staging-web',
+            permissions: 'admin'
+          },
+          {
+            name: 'eos',
+            path: '/eos/project/e/eos',
+            permissions: 'admin'
+          },
+          {
+            name: 'fdo',
+            path: '/eos/project/f/fdo',
+            permissions: 'writer'
+          },
+          {
+            name: 'noafs',
+            path: '/eos/project/n/noafs',
+            permissions: 'admin'
+          },
+          {
+            name: 'storage-ci',
+            path: '/eos/project/s/storage-ci',
+            permissions: 'writer'
+          },
+          {
+            name: 'test',
+            path: '/eos/project/t/test',
+            permissions: 'admin'
+          }
+        ]
+      }
       console.log('projects', data)
       const recievedResources = []
       if (data && data.projects) {
@@ -241,6 +297,9 @@ export default {
       })
 
       this.loading = false
+    },
+    isHighlightedFile(resource) {
+      return resource && resource.id === this.highlightedFile?.id
     }
   }
 }

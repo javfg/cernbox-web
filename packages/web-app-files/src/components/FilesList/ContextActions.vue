@@ -119,7 +119,8 @@ export default {
         ...this.$_fileActions_editorActions,
         ...this.$_fileActions_loadExternalAppActions(this.filterParams.resource),
         ...this.$_navigate_items,
-        ...this.$_fetch_items
+        ...this.$_fetch_items,
+        ...this.$_open_trashbin
       ]
 
       return [

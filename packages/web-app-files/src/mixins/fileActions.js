@@ -9,6 +9,7 @@ import Delete from './actions/delete'
 import DownloadFile from './actions/downloadFile'
 import DownloadFolder from './actions/downloadFolder'
 import Favorite from './actions/favorite'
+import OpenTrashbin from './actions/openTrashbin'
 import Fetch from './actions/fetch'
 import Move from './actions/move'
 import Navigate from './actions/navigate'
@@ -28,7 +29,8 @@ const actionsMixins = [
   'restore',
   'delete',
   'acceptShare',
-  'declineShare'
+  'declineShare',
+  'openTrashbin'
 ]
 
 export const EDITOR_MODE_EDIT = 'edit'
@@ -47,7 +49,8 @@ export default {
     Move,
     Navigate,
     Rename,
-    Restore
+    Restore,
+    OpenTrashbin
   ],
   computed: {
     ...mapState(['apps']),
@@ -209,7 +212,8 @@ export default {
       if (filteredMimeTypes === undefined) {
         return []
       }
-      const { app_providers: appProviders = [], default_application: defaultApplication } = filteredMimeTypes
+      const { app_providers: appProviders = [], default_application: defaultApplication } =
+        filteredMimeTypes
 
       return appProviders.map((app) => {
         const label = this.$gettext('Open in %{ appName }')
