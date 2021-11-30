@@ -592,6 +592,7 @@ export default {
           title: this.$gettext('Creating file failed…'),
           status: 'danger'
         })
+        console.error(error)
       }
     },
     checkNewFileName(fileName) {
