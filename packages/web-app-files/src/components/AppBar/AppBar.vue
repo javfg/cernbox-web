@@ -550,6 +550,7 @@ export default {
             'Basic ' + Buffer.from('public:' + this.publicLinkPassword).toString('base64')
           )
         }
+
         const response = await fetch(encodeURI(url), {
           method: 'POST',
           headers
@@ -569,7 +570,7 @@ export default {
           resource = await this.$client.publicFiles.getFileInfo(
             path,
             this.publicLinkPassword,
-            DavProperties.Default
+            DavProperties.PublicLink
           )
         }
         resource = buildResource(resource)
@@ -589,7 +590,6 @@ export default {
       } catch (error) {
         this.showMessage({
           title: this.$gettext('Creating file failed…'),
-          desc: error,
           status: 'danger'
         })
       }
