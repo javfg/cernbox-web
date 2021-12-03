@@ -439,10 +439,10 @@ export default {
         })
       } catch (error) {
         this.showMessage({
-          title: this.$gettext('Creating folder failed…'),
-          desc: error,
+          title: this.$gettext('Creating file failed…'),
           status: 'danger'
         })
+        console.error(error)
       }
 
       this.fileFolderCreationLoading = false
@@ -529,9 +529,9 @@ export default {
       } catch (error) {
         this.showMessage({
           title: this.$gettext('Creating file failed…'),
-          desc: error,
           status: 'danger'
         })
+        console.error(error)
       }
 
       this.fileFolderCreationLoading = false
