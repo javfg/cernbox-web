@@ -124,10 +124,7 @@ const actions = {
           token,
           isAuthenticated: true,
           groups: userGroups,
-          usertype:
-            user.id === 'einstein' || user.email === 'elizaveta.ragozina@cern.ch'
-              ? 'lightweight'
-              : user.usertype
+          usertype: user.id === 'einstein' ? 'lightweight' : user['user-type']
         })
 
         // Display quota in the sidebar
@@ -146,13 +143,8 @@ const actions = {
         context.commit('UPDATE_TOKEN', token)
       }
 
-<<<<<<< HEAD
       await promiseCapabilities
-      context.commit('SET_USER_READY', true)
-=======
-      await context.dispatch('loadCapabilities', { token })
       context.state.id && context.commit('SET_USER_READY', true)
->>>>>>> lightweight with tricks
     }
     // if called from login, use available vue-authenticate instance; else re-init
     if (!vueAuthInstance) {
