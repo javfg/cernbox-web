@@ -14,13 +14,13 @@
             <span v-translate> You are currently not collaborating on projects </span>
           </template>
         </no-content-message>
-        <oc-table-files
+        <resource-table
           v-else
           id="projects-table"
           v-model="selected"
           class="files-table"
-          :class="{ 'files-table-squashed': isSidebarOpen }"
-          :are-previews-displayed="displayPreviews"
+          :class="{ 'files-table-squashed': !sidebarClosed }"
+          :are-thumbnails-displayed="displayThumbnails"
           :resources="activeFiles"
           :target-route="targetRoute"
           :header-position="fileListHeaderY"
@@ -30,7 +30,7 @@
           <template #contextMenu="{ resource }">
             <context-actions v-if="isResourceInSelection(resource)" :items="selected" />
           </template>
-        </oc-table-files>
+        </resource-table>
       </div>
     </template>
   </div>
@@ -40,6 +40,7 @@
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
 import { shareStatus } from '../helpers/shareStatus'
 import { aggregateResourceShares } from '../helpers/resources'
+import ResourceTable from '../components/FilesList/ResourceTable.vue'
 
 import FileActions from '../mixins/fileActions'
 import MixinAcceptShare from '../mixins/actions/acceptShare'
@@ -62,7 +63,8 @@ export default {
   components: {
     ListLoader,
     NoContentMessage,
-    ContextActions
+    ContextActions,
+    ResourceTable
   },
 
   mixins: [
@@ -82,7 +84,7 @@ export default {
       const headers = new Headers()
       headers.append('Authorization', 'Bearer ' + ref.getToken)
       headers.append('X-Requested-With', 'XMLHttpRequest')
-      const response = yield fetch('api/v0/projects', {
+      /*    const response = yield fetch('api/v0/projects', {
         method: 'GET',
         headers
       })
@@ -90,9 +92,9 @@ export default {
         const message = `An error has occured: ${response.status}`
         throw new Error(message)
       }
-      const data = yield response.json()
+      const data = yield response.json() */
 
-      /* const data = {
+      const data = {
         projects: [
           {
             name: 'cboxmacwin',
@@ -105,7 +107,7 @@ export default {
             permissions: 'admin'
           }
         ]
-      } */
+      }
 
       console.log('projects', data)
       const recievedResources = []
@@ -160,13 +162,6 @@ export default {
     ...mapGetters(['isOcis', 'configuration', 'getToken']),
     ...mapState('Files/sidebar', { sidebarClosed: 'closed' }),
 
-    viewMode() {
-      if (Object.prototype.hasOwnProperty.call(this.$route.query, 'view-mode')) {
-        return parseInt(this.$route.query['view-mode'])
-      }
-      return shareStatus.accepted
-    },
-
     selected: {
       get() {
         return this.selectedFiles
@@ -175,125 +170,8 @@ export default {
         this.SET_FILE_SELECTION(resources)
       }
     },
-    groupingSettings() {
-      return {
-        groupingBy: 'Shared date',
-        showGroupingOptions: true,
-        groupingFunctions: {
-          'Share owner': function (row) {
-            return row.owner[0].displayName
-          },
-          'Name alphabetically': function (row) {
-            if (!isNaN(row.name.charAt(0))) return '#'
-            if (row.name.charAt(0) === '.') return row.name.charAt(1).toLowerCase()
-            return row.name.charAt(0).toLowerCase()
-          },
-          'Shared date': function (row) {
-            const interval1 = new Date()
-            interval1.setDate(interval1.getDate() - 7)
-            const interval2 = new Date()
-            interval2.setDate(interval2.getDate() - 30)
-            if (row.sdate > interval1.getTime()) {
-              return 'Recent'
-            } else if (row.sdate > interval2.getTime()) {
-              return 'This Month'
-            } else return 'Older'
-          }
-        },
-        functionColMappings: {
-          'Share owner': 'owner',
-          'Shared date': 'sdate'
-        }
-      }
-    },
-    groupingSettingsPreview() {
-      return {
-        previewAmount: 3
-      }
-    },
-    // pending shares
-    pendingSelected: {
-      get() {
-        return this.selectedFiles.filter((r) => r.status === shareStatus.pending)
-      },
-      set(resources) {
-        // this will (intentionally) reset the file selection to pending shares only.
-        this.SET_FILE_SELECTION(resources.filter((r) => r.status === shareStatus.pending))
-      }
-    },
-    pendingTitle() {
-      return this.$gettext('Pending shares')
-    },
-    pendingHasMore() {
-      return this.pendingCount > 3
-    },
-    pendingToggleMoreLabel() {
-      return this.showMorePending ? this.$gettext('Show less') : this.$gettext('Show more')
-    },
-    hasPending() {
-      return this.pendingCount > 0
-    },
-    pendingCount() {
-      return this.pending.length
-    },
-    pending() {
-      return this.activeFiles.filter((file) => file.status === shareStatus.pending)
-    },
-
-    // accepted or declined shares
-    sharesSelected: {
-      get() {
-        return this.selectedFiles.filter((r) => r.status === this.viewMode)
-      },
-      set(resources) {
-        // this will (intentionally) reset the file selection to shares for the current view mode only.
-        this.SET_FILE_SELECTION(resources.filter((r) => r.status === this.viewMode))
-      }
-    },
-    sharesTitle() {
-      return this.viewMode === shareStatus.declined
-        ? this.$gettext('Declined shares')
-        : this.$gettext('Accepted shares')
-    },
-    sharesToggleLabel() {
-      return this.viewMode === shareStatus.declined
-        ? this.$gettext('Show accepted shares')
-        : this.$gettext('Show declined shares')
-    },
-    sharesEmptyMessage() {
-      return this.viewMode === shareStatus.declined
-        ? this.$gettext("You don't have any previously declined shares.")
-        : this.$gettext("You are not collaborating on other people's resources.")
-    },
-    hasShares() {
-      return this.sharesCount > 0
-    },
-    sharesCount() {
-      return this.shares.length
-    },
-    sharesCountFiles() {
-      return this.shares.filter((s) => s.type !== 'folder').length
-    },
-    sharesCountFolders() {
-      return this.shares.filter((s) => s.type === 'folder').length
-    },
-    shares() {
-      return this.activeFiles.filter((file) => file.status === this.viewMode)
-    },
-    sharesOtherViewMode() {
-      return this.viewMode === shareStatus.accepted ? shareStatus.declined : shareStatus.accepted
-    },
-    sharesToggleRouterLink() {
-      return {
-        name: this.$route.name,
-        params: {
-          ...this.$route.params
-        },
-        query: {
-          ...this.$route.query,
-          'view-mode': this.sharesOtherViewMode
-        }
-      }
+    isEmpty() {
+      return this.activeFiles.length < 1
     },
 
     // misc
@@ -344,10 +222,6 @@ export default {
         onEnter: debounced,
         onExit: debounced.cancel
       })
-    },
-
-    togglePendingShowMore() {
-      this.showMorePending = !this.showMorePending
     },
 
     isResourceInSelection(resource) {
