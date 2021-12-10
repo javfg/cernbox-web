@@ -124,7 +124,7 @@ const actions = {
           token,
           isAuthenticated: true,
           groups: userGroups,
-          usertype: user.id === 'einstein' ? 'lightweight' : user['user-type']
+          usertype: user['user-type']
         })
 
         // Display quota in the sidebar
