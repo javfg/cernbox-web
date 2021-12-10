@@ -1,11 +1,17 @@
 <template>
   <main>
-    <oc-spinner
-      v-if="loading"
-      :aria-label="$gettext('Loading media')"
-      class="uk-position-center"
-      size="xlarge"
-    />
+    <oc-notifications>
+      <oc-notification-message
+        v-if="notificationMessage"
+        :message="notificationMessage"
+        :status="notificationStatus"
+        @close="clearNotificationMessage"
+      />
+    </oc-notifications>
+    <div v-if="loading" class="uk-position-center">
+      <oc-spinner size="xlarge" />
+      <p v-translate class="oc-invisible">Loading media</p>
+    </div>
     <iframe
       v-else
       id="drawio-editor"
@@ -21,15 +27,19 @@ import { basename } from 'path'
 import queryString from 'query-string'
 import { DateTime } from 'luxon'
 import { DavPermission, DavProperty } from 'web-pkg/src/constants'
+import FileAccess from './fileAccess'
 
 export default {
   name: 'DrawIoEditor',
+  mixins: [FileAccess],
   data: () => ({
     loading: true,
     filePath: '',
     fileExtension: '',
     isReadOnly: null,
-    currentETag: null
+    currentETag: null,
+    notificationMessage: null,
+    notificationStatus: null
   }),
   computed: {
     ...mapGetters(['getToken']),
@@ -56,7 +66,8 @@ export default {
     }
   },
   created() {
-    this.filePath = this.$route.params.filePath
+    this.isPublic = this.$route.name === 'draw-io-public'
+    this.filePath = `/${this.$route.params.filePath.split('/').filter(Boolean).join('/')}`
     this.fileExtension = this.filePath.split('.').pop()
     this.checkPermissions()
     window.addEventListener('message', (event) => {
@@ -67,6 +78,8 @@ export default {
             this.fileExtension === 'vsdx' ? this.importVisio() : this.load()
             break
           case 'autosave':
+            this.save(payload, true)
+            break
           case 'save':
             this.save(payload)
             break
@@ -86,9 +99,29 @@ export default {
         status: 'danger'
       })
     },
+    errorPopup(error) {
+      this.notificationStatus = 'danger'
+      this.notificationMessage = error
+    },
+    successPopup(msg) {
+      this.notificationStatus = 'success'
+      this.notificationMessage = msg
+    },
+    clearNotificationMessage() {
+      this.notificationMessage = null
+    },
+    errorNotification(error) {
+      this.$refs.drawIoEditor.contentWindow.postMessage(
+        JSON.stringify({
+          action: 'status',
+          message: error,
+          modified: false
+        }),
+        '*'
+      )
+    },
     checkPermissions() {
-      this.$client.files
-        .fileInfo(this.filePath, [DavProperty.Permissions])
+      this.fileInfo(this.filePath, [DavProperty.Permissions])
         .then((v) => {
           this.isReadOnly =
             v.fileInfo[DavProperty.Permissions].indexOf(DavPermission.Updateable) === -1
@@ -99,8 +132,7 @@ export default {
         })
     },
     load() {
-      this.$client.files
-        .getFileContents(this.filePath, { resolveWithResponseObject: true })
+      this.getFileContents(this.filePath)
         .then((resp) => {
           this.currentETag = resp.headers.ETag
           this.$refs.drawIoEditor.contentWindow.postMessage(
@@ -117,7 +149,7 @@ export default {
         })
     },
     importVisio() {
-      const url = this.$client.files.getFileUrl(this.filePath)
+      const url = this.getFileUrl(this.filePath)
       const headers = new Headers({
         Authorization: 'Bearer ' + this.getToken,
         'X-Requested-With': 'XMLHttpRequest'
@@ -160,23 +192,46 @@ export default {
           this.error(error)
         })
     },
-    save(payload) {
-      this.$client.files
-        .putFileContents(this.filePath, payload.xml, {
-          previousEntityTag: this.currentETag
-        })
+    save(payload, auto = false) {
+      this.putFileContents(this.filePath, payload.xml, {
+        previousEntityTag: this.currentETag
+      })
         .then((resp) => {
           this.currentETag = resp.ETag
-          this.$refs.drawIoEditor.contentWindow.postMessage(
-            JSON.stringify({
-              action: 'status',
-              modified: false
-            }),
-            '*'
-          )
+
+          const message = this.$gettext('File saved!')
+          if (auto) {
+            this.$refs.drawIoEditor.contentWindow.postMessage(
+              JSON.stringify({
+                action: 'status',
+                message: message,
+                modified: false
+              }),
+              '*'
+            )
+          } else {
+            this.successPopup(message)
+          }
         })
         .catch((error) => {
-          this.error(error)
+          const errorFunc = auto ? this.errorNotification : this.errorPopup
+          switch (error.statusCode) {
+            case 412:
+              errorFunc(
+                this.$gettext(
+                  'This file was updated outside this window. Please refresh the page. All changes will be lost, so download a copy first.'
+                )
+              )
+              break
+            case 500:
+              errorFunc(this.$gettext('Saving error. Error when contacting the server'))
+              break
+            case 401:
+              errorFunc(this.$gettext("Saving error. You're not authorized to save this file"))
+              break
+            default:
+              errorFunc(error.message || error)
+          }
         })
     },
     exit() {
