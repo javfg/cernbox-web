@@ -9,9 +9,6 @@
 
 <script>
 export default {
-  created() {},
-  mounted() {},
-  beforeDestroy() {},
   methods: {}
 }
 </script>
