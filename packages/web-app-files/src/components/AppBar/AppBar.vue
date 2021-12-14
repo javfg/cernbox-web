@@ -538,8 +538,9 @@ export default {
     },
     async addAppProviderFile(fileName) {
       try {
-        const path = pathUtil.join(this.currentPath, fileName)
-        const url = '/app/new?filename=' + path
+        const parent = this.currentFolder.fileId
+        // TODO shouuld url be a capability?
+        const url = `/app/new?parent_container_id=${parent}&filename=${fileName}`
         const headers = new Headers()
         if (!this.isPublicFilesRoute) {
           headers.append('Authorization', 'Bearer ' + this.getToken)
@@ -563,6 +564,7 @@ export default {
           throw new Error(message)
         }
 
+        const path = pathUtil.join(this.currentPath, fileName)
         let resource
         if (this.isPersonalRoute) {
           resource = await this.$client.files.fileInfo(path, DavProperties.Default)
