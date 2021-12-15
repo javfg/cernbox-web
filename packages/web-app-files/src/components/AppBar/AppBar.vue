@@ -173,7 +173,7 @@ export default {
   }),
   computed: {
     ...mapGetters('External', ['mimeTypes']),
-    ...mapGetters(['getToken', 'configuration', 'newFileHandlers', 'quota', 'user']),
+    ...mapGetters(['getToken', 'capabilities', 'configuration', 'newFileHandlers', 'quota', 'user']),
     ...mapGetters('Files', ['files', 'currentFolder', 'selectedFiles', 'publicLinkPassword']),
     ...mapState(['route']),
     ...mapState('Files', ['areHiddenFilesShown']),
@@ -539,8 +539,14 @@ export default {
     async addAppProviderFile(fileName) {
       try {
         const parent = this.currentFolder.fileId
-        // TODO shouuld url be a capability?
-        const url = `/app/new?parent_container_id=${parent}&filename=${fileName}`
+
+        const configUrl = this.configuration.server
+        const appNewUrl = this.capabilities.files.app_providers[0].new_url.replace(/^\/+/, '')
+        const url =
+          configUrl +
+          appNewUrl +
+          `?parent_container_id=${parent}&filename=${fileName}`
+
         const headers = new Headers()
         if (!this.isPublicFilesRoute) {
           headers.append('Authorization', 'Bearer ' + this.getToken)
