@@ -541,7 +541,7 @@ export default {
         const parent = this.currentFolder.fileId
 
         const configUrl = this.configuration.server
-        const appNewUrl = this.capabilities.files.app_providers[0].new_url.replace(/^\/+/, '')
+        const appNewUrl = 'app/new'//this.capabilities.files.app_providers[0].new_url.replace(/^\/+/, '')
         const url =
           configUrl +
           appNewUrl +
@@ -557,6 +557,18 @@ export default {
             'Basic ' + Buffer.from('public:' + this.publicLinkPassword).toString('base64')
           )
         }
+
+
+        // const headers = {
+        //   'X-Requested-With': 'XMLHttpRequest',
+        //   ...(this.publicLinkPassword && {
+        //     Authorization:
+        //       'Basic ' + Buffer.from(['public', this.publicLinkPassword].join(':')).toString('base64')
+        //   }),
+        //   ...(this.getToken && {
+        //     Authorization: 'Bearer ' + this.getToken
+        //   })
+        // }
 
         const response = await fetch(encodeURI(url), {
           method: 'POST',
