@@ -6,7 +6,7 @@
     <div id="web-content-main" class="oc-px-s oc-pb-s">
       <message-bar :active-messages="activeMessages" @deleteMessage="deleteMessage" />
       <div class="app-container oc-flex">
-        <sidebar-nav v-if="isSidebarVisible" class="app-navigation" :nav-items="sidebarNavItems" />
+        <sidebar-nav v-if="isSidebarVisible" class="app-navigation" :nav-items="sidebarNavItems" :links="sidebarLinks"/>
         <router-view class="app-content oc-width-1-1" />
       </div>
     </div>
