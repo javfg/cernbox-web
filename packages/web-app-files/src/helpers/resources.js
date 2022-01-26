@@ -12,7 +12,8 @@ import {
   SpacePeopleShareRoles,
   spaceRoleEditor,
   spaceRoleManager,
-  spaceRoleViewer
+  spaceRoleViewer,
+  spaceRoleDeny
 } from './share'
 import { extractStorageId } from './resource'
 
@@ -109,6 +110,9 @@ export function buildResource(resource) {
     },
     isReceivedShare: function () {
       return this.permissions.indexOf(DavPermission.Shared) >= 0
+    },
+    canDeny: function () {
+      return this.permissions.indexOf(DavPermission.Deny) >= 0
     }
   }
 }
@@ -232,6 +236,9 @@ export function buildSpace(space) {
     },
     isReceivedShare: function () {
       return false
+    },
+    canDeny: function () {
+      return false // FIXME
     }
   }
 }
@@ -382,6 +389,7 @@ export function buildSharedResource(share, incomingShares = false, allowSharePer
     resource.canShare = () => true
     resource.canRename = () => true
     resource.canBeDeleted = () => true
+    resource.canDeny = () => SharePermissions.deny.enabled(share.permissions)
   }
 
   resource.extension = isFolder ? '' : _getFileExtension(resource.name)
@@ -419,6 +427,10 @@ export function buildSpaceShare(s, storageId) {
     case spaceRoleViewer.name:
       permissions = spaceRoleViewer.bitmask(true)
       role = spaceRoleViewer
+      break
+    case spaceRoleDeny.name:
+      permissions = spaceRoleDeny.bitmask(true)
+      role = spaceRoleDeny
       break
   }
 
