@@ -152,6 +152,7 @@ export const peopleRoleEditorFolder = new PeopleShareRole(
     SharePermissions.share
   ]
 )
+
 export const peopleRoleCustomFile = new CustomShareRole(
   'custom',
   false,
