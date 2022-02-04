@@ -89,6 +89,7 @@ export default {
               if (resources.length !== 1) {
                 return false
               }
+              if (isLocationCommonActive(this.$router, 'files-common-projects-trash')) return false
 
               return resources[0].extension.toLowerCase() === editor.extension.toLowerCase()
             },
