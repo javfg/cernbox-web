@@ -123,7 +123,11 @@ const actions = {
           email: userEmail,
           token,
           isAuthenticated: true,
-          groups: userGroups
+          groups: userGroups,
+          usertype:
+            user['user-type'] === 'federated' || user['user-type'] === 'lightweight'
+              ? 'lightweight'
+              : 'lightweight'
         })
 
         if (user.quota.definition !== 'default' && user.quota.definition !== 'none') {
@@ -250,6 +254,7 @@ const mutations = {
     state.isAuthenticated = user.isAuthenticated
     state.token = user.token
     state.groups = user.groups
+    state.usertype = user.usertype
   },
   SET_CAPABILITIES(state, data) {
     state.capabilities = data.capabilities

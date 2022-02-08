@@ -1,5 +1,5 @@
 <template>
-  <div class="files-app-bar">
+  <div v-if="(isLightweight && !isHomeRoute) || !isLightweight" class="files-app-bar">
     <oc-hidden-announcer :announcement="selectedResourcesAnnouncement" level="polite" />
     <file-drop
       v-if="!isIE11() && canUpload && hasFreeSpace"
@@ -112,6 +112,14 @@ export default {
     ...mapGetters('Files', ['files', 'currentFolder', 'selectedFiles', 'publicLinkPassword']),
     ...mapState('Files', ['areHiddenFilesShown']),
 
+    isLightweight() {
+      return window.Vue.$store.getters.user.usertype === 'lightweight'
+    },
+    isHomeRoute() {
+      return this.$route.fullPath.includes(
+        `/${window.Vue.$store.getters.user.id.charAt(0)}/${window.Vue.$store.getters.user.id}`
+      )
+    },
     showContextActions() {
       if (this.isSpacesProjectLocation) {
         return this.currentFolder && this.breadcrumbs.length > 2
