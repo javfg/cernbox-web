@@ -13,6 +13,7 @@ import SpaceProject from './views/spaces/Project.vue'
 import SpaceTrashbin from './views/spaces/Trashbin.vue'
 import SpaceProjects from './views/spaces/Projects.vue'
 import Trashbin from './views/Trashbin.vue'
+import Home from './views/Home.vue'
 import translations from '../l10n/translations.json'
 import quickActions from './quickActions'
 import store from './store'
@@ -39,14 +40,18 @@ const appInfo = {
   extensions: [],
   fileSideBars
 }
-const navItems = [
+
+const navItemFirst = [
   {
     name: $gettext('Personal'),
     icon: appInfo.icon,
+    hideByLightweight: true,
     route: {
       path: `/${appInfo.id}/spaces/personal/home`
     }
-  },
+  }
+]
+const navItems = [
   {
     name: $gettext('Favorites'),
     icon: 'star',
@@ -87,6 +92,16 @@ const navItems = [
   }
 ]
 
+const navItemsLightweight = [
+  {
+    name: $gettext('Shared with me'),
+    icon: 'share-forward',
+    route: {
+      path: `/${appInfo.id}/shares/with-me`
+    }
+  }
+]
+
 export default {
   appInfo,
   store,
@@ -108,9 +123,10 @@ export default {
       Projects: SpaceProjects,
       Trashbin: SpaceTrashbin
     },
-    Trashbin
+    Trashbin,
+    Home
   }),
-  navItems,
+  navItems: navItemFirst,
   quickActions,
   translations,
   ready({ router, store }) {
@@ -123,6 +139,15 @@ export default {
     bus.publish('app.search.register.provider', Registry.sdkSearch)
   },
   userReady({ store }) {
+    ;(store.getters.user.usertype && store.getters.user.usertype === 'lightweight'
+      ? navItemsLightweight
+      : navItems
+    ).forEach((navItem) => {
+      store.commit('ADD_NAV_ITEM', {
+        extension: 'files',
+        navItem
+      })
+    })
     archiverService.initialize(
       store.getters.configuration.server || window.location.origin,
       get(store, 'getters.capabilities.files.archivers', []),
