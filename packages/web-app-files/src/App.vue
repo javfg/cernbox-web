@@ -146,6 +146,33 @@ main {
 </style>
 
 <style lang="scss">
+.oc-tbody-tr:not(.oc-table-highlighted):hover {
+  background-color: var(--oc-color-background-hover);
+}
+
+.files-app-bar-actions .oc-drop li:hover {
+  background-color: var(--oc-color-input-border);
+}
+.resource-table-actions .files-quick-action-public-link {
+  visibility: hidden;
+}
+
+.oc-tbody-tr:hover .resource-table-actions .files-quick-action-public-link {
+  visibility: visible;
+}
+.resource-table-actions .files-quick-action-collaborators {
+  visibility: hidden;
+}
+
+.oc-tbody-tr:hover .resource-table-actions .files-quick-action-collaborators {
+  visibility: visible;
+}
+iframe {
+  border-width: 0;
+}
+.getBlock {
+  color: white;
+}
 // Hide files table columns
 .files-table {
   .oc-table-header-cell-mdate,
