@@ -108,4 +108,19 @@ main {
 #files-upload-progress {
   grid-area: upload;
 }
+
+.resource-table-actions .files-quick-action-public-link {
+  visibility: hidden;
+}
+
+.oc-tbody-tr:hover .resource-table-actions .files-quick-action-public-link {
+  visibility: visible;
+}
+.resource-table-actions .files-quick-action-collaborators {
+  visibility: hidden;
+}
+
+.oc-tbody-tr:hover .resource-table-actions .files-quick-action-collaborators {
+  visibility: visible;
+}
 </style>
