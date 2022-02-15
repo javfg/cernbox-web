@@ -9542,20 +9542,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"owncloud-sdk@npm:~2.0.0":
-  version: 2.0.0
-  resolution: "owncloud-sdk@npm:2.0.0"
+"owncloud-sdk@npm:~2.0.1":
+  version: 2.0.1
+  resolution: "owncloud-sdk@npm:2.0.1"
   peerDependencies:
-    axios: ^0.25.0
+    axios: ^0.26.0
     cross-fetch: ^3.0.6
     promise: ^8.0.3
     qs: ^6.10.3
     semver: ^7.3.5
     utf8: ^3.0.0
     uuid: ^8.2.0
-    webdav: 4.6.0
+    webdav: 4.8.0
     xml-js: ^1.6.11
-  checksum: 67e65e2dd55e650f11b29888766660feea25ede5e48c171c403c42c027f9b26165ea23856a68e450f7e2df57ee8bff70a83524796d3b1c54cae795acada1948d
+  checksum: c84385c7070810eab2a1a6914029543c8830b94c5ff285a895ebfc8a539255499ff9a467c108c0dcc9ed9aff466425b7d51566640758b92d381b2d630d74f919
   languageName: node
   linkType: hard
 
@@ -13489,7 +13489,7 @@ __metadata:
     luxon: ^2.3.0
     oidc-client: 1.11.5
     owncloud-design-system: 12.1.0
-    owncloud-sdk: ~2.0.0
+    owncloud-sdk: ~2.0.1
     p-queue: ^6.1.1
     popper-max-size-modifier: ^0.2.0
     portal-vue: ^2.1.7
