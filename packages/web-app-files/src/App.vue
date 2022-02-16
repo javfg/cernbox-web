@@ -150,8 +150,18 @@ main {
   background-color: var(--oc-color-background-hover);
 }
 
-.files-app-bar-actions .oc-drop li:hover {
+.files-app-bar-actions .oc-drop li:hover,
+.oc-files-context-action:hover {
   background-color: var(--oc-color-input-border);
+  border-radius: 4px;
+}
+
+.files-app-bar-actions .oc-drop li {
+  margin: 0;
+  padding-top: 4px !important;
+  padding-top: 4px !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
 }
 .resource-table-actions .files-quick-action-public-link {
   visibility: hidden;

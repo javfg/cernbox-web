@@ -222,11 +222,11 @@ export default {
       vertical-align: top;
       width: 100%;
 
-      span:hover,
+      /*span:hover,
       &:hover {
         color: var(--oc-color-swatch-passive-hover) !important;
         text-decoration: underline !important;
-      }
+      }*/
     }
   }
 
