@@ -34,11 +34,14 @@
         <span />
       </template>
     </oc-select>
-    <p
-      id="files-share-invite-hint"
-      class="oc-mt-xs oc-text-meta"
-      v-text="inviteDescriptionMessage"
-    />
+    <div class="oc-flex oc-flex-between oc-p-s">
+      <p
+        id="files-share-invite-hint"
+        class="oc-mt-xs oc-text-meta"
+        v-text="inviteDescriptionMessage"
+      />
+      <oc-icon v-oc-tooltip="inviteDescriptionAdditionalMessage" name="information" />
+    </div>
     <div class="oc-flex oc-flex-middle oc-flex-between oc-mb-l">
       <role-dropdown
         :resource="highlightedFile"
@@ -110,7 +113,11 @@ export default {
     inviteDescriptionMessage() {
       return this.$gettext('Add new person by name, email or federation IDs')
     },
-
+    inviteDescriptionAdditionalMessage() {
+      return this.$gettext(
+        'Add service or secondary accounts prefixing the username with "a:", like "a:doe"; \xa0\xa0 add guest accounts prefixing the username with "l:", like "l:doe"'
+      )
+    },
     $_announcementWhenCollaboratorAdded() {
       return this.$gettext('Person was added')
     },
