@@ -4,6 +4,7 @@
       id="files-share-invite-input"
       ref="ocSharingAutocomplete"
       v-model="selectedCollaborators"
+      v-oc-tooltip="inviteDescriptionAdditionalMessage"
       :options="autocompleteResults"
       :loading="searchInProgress"
       :multiple="true"
@@ -35,11 +36,13 @@
         <span />
       </template>
     </oc-select>
-    <p
-      id="files-share-invite-hint"
-      class="oc-mt-xs oc-text-meta"
-      v-text="inviteDescriptionMessage"
-    />
+    <!--<div class="oc-flex oc-flex-between oc-p-s">
+      <p
+        id="files-share-invite-hint"
+        class="oc-mt-xs oc-text-meta"
+        v-text="inviteDescriptionMessage"
+      />
+    </div>-->
     <div class="oc-flex oc-flex-middle oc-flex-between oc-mb-l">
       <role-dropdown
         :resource="highlightedFile"
@@ -123,7 +126,11 @@ export default {
     inviteDescriptionMessage() {
       return this.$gettext('Add new person by name, email or federation IDs')
     },
-
+    inviteDescriptionAdditionalMessage() {
+      return this.$gettext(
+        'Search by name, email or federation IDs, service or secondary accounts prefixing the username with "a:" (like "a:doe"), guest accounts prefixing the username with "l:" (like "l:doe")'
+      )
+    },
     $_announcementWhenCollaboratorAdded() {
       return this.$gettext('Person was added')
     },
