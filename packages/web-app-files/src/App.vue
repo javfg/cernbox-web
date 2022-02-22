@@ -151,18 +151,29 @@ main {
 }
 
 .files-app-bar-actions .oc-drop li:hover,
-.oc-files-context-action:hover {
+.oc-files-context-action:hover,
+#oc-breadcrumb-contextmenu li:hover {
   background-color: var(--oc-color-input-border);
   border-radius: 4px;
+  text-decoration: none !important;
 }
 
-.files-app-bar-actions .oc-drop li {
+#oc-breadcrumb-contextmenu .oc-card {
+  padding: 8px !important;
+}
+
+#oc-breadcrumb-contextmenu li button:hover {
+  text-decoration: none !important;
+}
+
+#new-file-menu-drop li {
   margin: 0;
   padding-top: 4px !important;
   padding-top: 4px !important;
-  padding-left: 2px !important;
-  padding-right: 2px !important;
+  padding-left: 6px !important;
+  padding-right: 4px !important;
 }
+
 .resource-table-actions .files-quick-action-public-link {
   visibility: hidden;
 }
