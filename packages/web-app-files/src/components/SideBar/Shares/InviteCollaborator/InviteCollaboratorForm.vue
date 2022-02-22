@@ -4,6 +4,7 @@
       id="files-share-invite-input"
       ref="ocSharingAutocomplete"
       v-model="selectedCollaborators"
+      v-oc-tooltip="inviteDescriptionAdditionalMessage"
       :options="autocompleteResults"
       :loading="searchInProgress"
       :multiple="true"
@@ -34,14 +35,13 @@
         <span />
       </template>
     </oc-select>
-    <div class="oc-flex oc-flex-between oc-p-s">
+    <!--<div class="oc-flex oc-flex-between oc-p-s">
       <p
         id="files-share-invite-hint"
         class="oc-mt-xs oc-text-meta"
         v-text="inviteDescriptionMessage"
       />
-      <oc-icon v-oc-tooltip="inviteDescriptionAdditionalMessage" name="information" />
-    </div>
+    </div>-->
     <div class="oc-flex oc-flex-middle oc-flex-between oc-mb-l">
       <role-dropdown
         :resource="highlightedFile"
@@ -115,7 +115,7 @@ export default {
     },
     inviteDescriptionAdditionalMessage() {
       return this.$gettext(
-        'Add service or secondary accounts prefixing the username with "a:", like "a:doe"; \xa0\xa0 add guest accounts prefixing the username with "l:", like "l:doe"'
+        'Search by name, email or federation IDs, service or secondary accounts prefixing the username with "a:" (like "a:doe"), guest accounts prefixing the username with "l:" (like "l:doe")'
       )
     },
     $_announcementWhenCollaboratorAdded() {
