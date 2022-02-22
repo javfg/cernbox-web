@@ -156,9 +156,9 @@ export default {
 
     inviteDescriptionMessage() {
       if (this.capabilities.files_sharing.federation?.outgoing === true) {
-        return this.$gettext('Add new person by name, email or federation IDs')
+        return this.$gettext('Add new person by name, email, service/secondary/guest accounts, or federation IDs')
       }
-      return this.$gettext('Add new person by name or email')
+      return this.$gettext('Add new person by name, email or service/secondary/guest accounts')
     },
 
     $_announcementWhenCollaboratorAdded() {
