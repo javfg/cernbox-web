@@ -8,6 +8,16 @@ import OidcCallbackPage from '../pages/oidcCallback.vue'
 import AccessDeniedPage from '../pages/accessDenied.vue'
 import Account from '../pages/account.vue'
 
+import * as Sentry from '@sentry/browser'
+import * as Integrations from '@sentry/integrations'
+
+const isQa = window.location.hostname.includes('qa') || window.location.hostname.includes('dev')
+Sentry.init({
+  dsn: 'https://e08b97f4178b4bf69deea1b7c1299f5a@cernbox-sentry.web.cern.ch/2',
+  integrations: [new Integrations.Vue({Vue, attachProps: true, logErrors: true })],
+  environment: isQa ? 'development' : 'production'
+})
+
 Vue.use(Router)
 
 // type: patch
