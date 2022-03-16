@@ -14,6 +14,7 @@
       <portal-target name="app.runtime.header" multiple></portal-target>
     </div>
     <div class="oc-topbar-right oc-flex oc-flex-middle oc-flex-between">
+      <tour />
       <theme-switcher v-if="darkThemeAvailable" />
       <feedback-link v-if="isFeedbackLinkEnabled" />
       <notifications v-if="isNotificationBellEnabled" />
@@ -31,6 +32,7 @@ import UserMenu from './UserMenu.vue'
 import Notifications from './Notifications.vue'
 import FeedbackLink from './FeedbackLink.vue'
 import ThemeSwitcher from './ThemeSwitcher.vue'
+import Tour from './Tour/Tour.vue'
 
 export default {
   components: {
@@ -38,7 +40,8 @@ export default {
     FeedbackLink,
     Notifications,
     ThemeSwitcher,
-    UserMenu
+    UserMenu,
+    Tour
   },
   mixins: [NavigationMixin],
   props: {
