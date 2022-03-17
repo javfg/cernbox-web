@@ -272,13 +272,18 @@ export function aggregateResourceShares(
   token
 ) {
   if (incomingShares) {
+    shares = addSharedWithToShares(shares)[0]
     return orderBy(shares, ['file_target', 'permissions'], ['asc', 'desc']).map((share) =>
       buildSharedResource(share, incomingShares, allowSharePermission)
     )
   }
 
   shares.sort((a, b) => a.path.localeCompare(b.path))
+  const resources = addSharedWithToShares(shares)[1]
+  return resources.map((share) => buildSharedResource(share, incomingShares, allowSharePermission))
+}
 
+function addSharedWithToShares(shares) {
   const resources = []
   let previousShare = null
   for (const share of shares) {
@@ -328,8 +333,7 @@ export function aggregateResourceShares(
     previousShare = share
     resources.push(share)
   }
-
-  return resources.map((share) => buildSharedResource(share, incomingShares, allowSharePermission))
+  return [shares, resources]
 }
 
 export function buildSharedResource(share, incomingShares = false, allowSharePermission) {
@@ -358,7 +362,7 @@ export function buildSharedResource(share, incomingShares = false, allowSharePer
         shareType: ShareTypes.user.value
       }
     ]
-
+    resource.sharedWith = share.sharedWith
     resource.status = share.state
     resource.name = path.basename(share.file_target)
     resource.path = share.file_target
