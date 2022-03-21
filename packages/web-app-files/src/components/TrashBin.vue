@@ -1,5 +1,8 @@
 <template>
   <div>
+    <h2 v-if="$route.query.project" class="oc-px-m oc-py-s">
+      Trashbin for project "{{ $route.query.name }}"
+    </h2>
     <list-loader v-if="loadResourcesTask.isRunning" />
     <template v-else>
       <no-content-message

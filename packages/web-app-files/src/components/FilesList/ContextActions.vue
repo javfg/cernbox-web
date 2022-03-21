@@ -42,6 +42,7 @@ import ShowShares from '../../mixins/actions/showShares'
 import SetSpaceImage from '../../mixins/spaces/actions/setImage'
 import SetSpaceReadme from '../../mixins/spaces/actions/setReadme'
 import SpaceNavigate from '../../mixins/spaces/actions/navigate'
+import ProjectTrashin from '../../mixins/actions/projectTrashbin'
 
 export default {
   name: 'ContextActions',
@@ -66,7 +67,8 @@ export default {
     ShowShares,
     SetSpaceImage,
     SetSpaceReadme,
-    SpaceNavigate
+    SpaceNavigate,
+    ProjectTrashin
   ],
 
   props: {
@@ -135,7 +137,8 @@ export default {
         ...this.$_move_items,
         ...this.$_copy_items,
         ...this.$_emptyTrashBin_items,
-        ...this.$_restore_items
+        ...this.$_restore_items,
+        ...this.$_project_trashbin
       ].filter((item) => item.isEnabled(this.filterParams))
     },
 
@@ -168,7 +171,8 @@ export default {
         ...this.$_declineShare_items,
         ...this.$_setSpaceImage_items,
         ...this.$_setSpaceReadme_items,
-        ...this.$_navigate_space_items
+        ...this.$_navigate_space_items,
+        ...this.$_project_trashbin
       ].filter((item) => item.isEnabled(this.filterParams))
     },
 

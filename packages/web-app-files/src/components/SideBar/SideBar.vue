@@ -92,7 +92,7 @@ import { VisibilityObserver } from 'web-pkg/src/observer'
 import { DavProperties } from 'web-pkg/src/constants'
 
 import { buildResource } from '../../helpers/resources'
-import { isLocationPublicActive, isLocationSharesActive, isLocationTrashActive } from '../../router'
+import { isLocationPublicActive, isLocationSharesActive, isLocationTrashActive, isLocationCommonActive } from '../../router'
 import { computed } from '@vue/composition-api'
 
 import FileInfo from './FileInfo.vue'
@@ -308,6 +308,7 @@ export default {
       if (
         isLocationTrashActive(this.$router, 'files-trash-personal') ||
         isLocationTrashActive(this.$router, 'files-trash-spaces-project') ||
+        isLocationCommonActive(this.$router, 'files-common-projects-trash') ||
         this.highlightedFileIsSpace
       ) {
         this.selectedFile = this.highlightedFile

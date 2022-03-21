@@ -30,12 +30,12 @@
       </div>
       <div class="files-app-bar-actions">
         <div
-          v-if="showActions || selectedFiles.length > 0 || hasBulkActions"
+          v-if="showActions || selectedFiles.length > 0 || hasBulkActions || isProjectsRoute"
           class="oc-flex-1 oc-flex oc-flex-start"
           style="gap: 15px"
         >
           <create-and-upload
-            v-if="showActions && areDefaultActionsVisible"
+            v-if="showActions && areDefaultActionsVisible && !isProjectsRoute"
             :can-upload="canUpload"
             :current-path="currentPath"
             :has-free-space="hasFreeSpace"
@@ -44,6 +44,22 @@
             @error="onFileError"
             @progress="onFileProgress"
           />
+          <template v-if="isProjectsRoute && areDefaultActionsVisible && !isLightweight">
+            <oc-button
+              id="new-project-menu-btn"
+              key="new-project-menu-btn-enabled"
+              :aria-label="newButtonAriaLabel"
+              variation="primary"
+              appearance="filled"
+              :disabled="isNewProjectBtnDisabled"
+              class="oc-background-primary-gradient"
+              style="white-space: nowrap"
+              @click="onNewProjectButtonClick"
+            >
+              <oc-icon name="add" />
+              <translate>New Project</translate>
+            </oc-button>
+          </template>
           <size-info v-if="hasBulkActions && selectedFiles.length > 0" class="oc-visible@l" />
           <batch-actions v-if="hasBulkActions" />
         </div>
@@ -119,6 +135,9 @@ export default {
     ...mapGetters('Files', ['files', 'currentFolder', 'selectedFiles', 'publicLinkPassword']),
     ...mapState('Files', ['areHiddenFilesShown']),
 
+    isProjectsRoute() {
+      return this.$route.name === 'files-common-projects'
+    },
     isLightweight() {
       return window.Vue.$store.getters.user.usertype === 'lightweight'
     },
@@ -291,6 +310,10 @@ export default {
       return this.selectedFiles.length < 1
     },
 
+    isNewprojectBtnDisabled() {
+      return true
+    },
+
     selectedResourcesAnnouncement() {
       if (this.selectedFiles.length === 0) {
         return this.$gettext('No items selected.')
@@ -319,6 +342,13 @@ export default {
     ...mapActions(['openFile', 'showMessage']),
     ...mapMutations('Files', ['UPSERT_RESOURCE', 'SET_HIDDEN_FILES_VISIBILITY']),
     ...mapMutations(['SET_QUOTA']),
+
+    onNewProjectButtonClick() {
+      window.open(
+        'https://cern.service-now.com/service-portal?id=sc_cat_item&name=EOS-projet-space&se=CERNBox-Service',
+        '_blank'
+      )
+    },
 
     async onFileSuccess(event, file) {
       try {
