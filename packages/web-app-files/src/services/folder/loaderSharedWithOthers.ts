@@ -30,6 +30,8 @@ export class FolderLoaderSharedWithOthers implements FolderLoader {
 
       resources = yield resources.json()
       resources = resources.ocs.data
+      // filter out shares via link only
+      resources = resources.filter((r) => r.share_type === 0)
 
       if (resources.length) {
         const configuration = store.getters.configuration
