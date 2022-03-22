@@ -14,7 +14,7 @@
       <portal-target name="app.runtime.header" multiple></portal-target>
     </div>
     <div class="oc-topbar-right oc-flex oc-flex-middle oc-flex-between">
-      <tour />
+      <tour v-if="!isLightweight"/>
       <theme-switcher v-if="darkThemeAvailable" />
       <feedback-link v-if="isFeedbackLinkEnabled" />
       <notifications v-if="isNotificationBellEnabled" />
@@ -58,6 +58,10 @@ export default {
   },
   computed: {
     ...mapGetters(['configuration', 'user']),
+
+    isLightweight() {
+      return window.Vue.$store.getters.user.usertype === 'lightweight'
+    },
 
     activeRoutePath() {
       return this.$router.resolve(this.$route).location.path
