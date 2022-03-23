@@ -36,6 +36,8 @@
 import { mapGetters } from 'vuex'
 import ErrorScreen from './components/ErrorScreen.vue'
 import LoadingScreen from './components/LoadingScreen.vue'
+import { DavProperties } from 'web-pkg/src/constants'
+import { buildResource } from '../../web-app-files/src/helpers/resources'
 
 // FIXME: hacky, get rid asap, just a workaround
 // same as packages/web-app-files/src/views/PublicFiles.vue
@@ -69,7 +71,8 @@ export default {
     errorMessage: '',
     appUrl: '',
     method: '',
-    formParameters: {}
+    formParameters: {},
+    fileId: ''
   }),
   computed: {
     ...mapGetters(['getToken', 'capabilities', 'configuration']),
@@ -90,14 +93,26 @@ export default {
     appName() {
       return this.$route.params.appName
     },
-    fileId() {
-      return this.$route.params.fileId
+    filePath() {
+      return this.$route.params.filePath
     }
+  },
+  mounted() {
+    if (this.$route.params.filePath && this.$route.params.appName)
+      document.title = `${this.$route.params.filePath.split('/').pop()} - ${
+        this.$route.params.appName
+      }`
+    else if (this.$route.params.appName) document.title = `${this.$route.params.appName}`
+    else if (this.$route.params.filePath) document.title = `${this.$route.params.filePath}`
   },
   async created() {
     await unauthenticatedUserReady(this.$router, this.$store)
 
     this.loading = true
+
+    // get fileId by filePath
+    const resource = await this.$client.files.fileInfo(this.filePath, DavProperties.Default)
+    this.fileId = buildResource(resource).id
 
     // build headers with respect to the actual auth situation
     const { 'public-token': publicToken } = this.$route.query

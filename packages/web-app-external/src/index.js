@@ -15,7 +15,7 @@ const appInfo = {
 const routes = [
   {
     name: 'apps',
-    path: '/:fileId/:appName?',
+    path: '/:filePath/:appName?',
     component: App,
     meta: {
       auth: false,

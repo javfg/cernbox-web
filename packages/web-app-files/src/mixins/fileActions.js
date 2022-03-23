@@ -232,8 +232,7 @@ export default {
       if (resources.length !== 1) {
         return []
       }
-
-      const { mimeType, fileId } = resources[0]
+      const { mimeType, fileId, webDavPath } = resources[0]
       const mimeTypes = this.$store.getters['External/mimeTypes'] || []
       if (
         mimeType === undefined ||
@@ -260,19 +259,19 @@ export default {
           class: `oc-files-actions-${app.name}-trigger`,
           isEnabled: () => true,
           canBeDefault: defaultApplication === app.name,
-          handler: () => this.$_fileActions_openLink(app.name, fileId),
+          handler: () => this.$_fileActions_openLink(app.name, webDavPath),
           label: () => this.$gettextInterpolate(label, { appName: app.name })
         }
       })
     },
 
-    $_fileActions_openLink(appName, resourceId) {
+    $_fileActions_openLink(appName, filePath) {
       const routeOpts = this.$_fileActions__routeOpts(
         {
           routeName: 'external-apps'
         },
+        filePath,
         undefined,
-        resourceId,
         undefined
       )
 
