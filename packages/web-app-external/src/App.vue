@@ -38,6 +38,7 @@ import ErrorScreen from './components/ErrorScreen.vue'
 import LoadingScreen from './components/LoadingScreen.vue'
 import { DavProperties } from 'web-pkg/src/constants'
 import { buildResource } from '../../web-app-files/src/helpers/resources'
+import { useAppDefaults } from 'web-pkg/src/composables'
 
 // FIXME: hacky, get rid asap, just a workaround
 // same as packages/web-app-files/src/views/PublicFiles.vue
@@ -63,6 +64,13 @@ export default {
   components: {
     ErrorScreen,
     LoadingScreen
+  },
+  setup() {
+    return {
+      ...useAppDefaults({
+        applicationName: 'external'
+      })
+    }
   },
 
   data: () => ({
@@ -92,9 +100,6 @@ export default {
     },
     appName() {
       return this.$route.params.appName
-    },
-    filePath() {
-      return this.$route.params.filePath
     }
   },
   mounted() {
@@ -110,9 +115,10 @@ export default {
 
     this.loading = true
 
-    // get fileId by filePath
-    const resource = await this.$client.files.fileInfo(this.filePath, DavProperties.Default)
-    this.fileId = buildResource(resource).id
+    // get filePath and fileId
+    this.filePath = this.currentFileContext.path
+    this.fileId = this.getFileInfo().id
+    console.log('filePath, fileId', this.filePath, this.fileId)
 
     // build headers with respect to the actual auth situation
     const { 'public-token': publicToken } = this.$route.query
@@ -170,6 +176,12 @@ export default {
       this.$nextTick(() => this.$refs.subm.click())
     }
     this.loading = false
+  },
+  methods: {
+    async getFileInfo() {
+      const file = await this.getFileInfo(this.filePath, DavProperties.Default)
+      return buildResource(file)
+    }
   }
 }
 </script>
