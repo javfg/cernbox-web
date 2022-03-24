@@ -40,24 +40,6 @@ import { DavProperties } from 'web-pkg/src/constants'
 import { buildResource } from '../../web-app-files/src/helpers/resources'
 import { useAppDefaults } from 'web-pkg/src/composables'
 
-// FIXME: hacky, get rid asap, just a workaround
-// same as packages/web-app-files/src/views/PublicFiles.vue
-const unauthenticatedUserReady = async (router, store) => {
-  if (store.getters.userReady) {
-    return
-  }
-
-  const publicToken = router.currentRoute.query['public-token']
-  const publicLinkPassword = store.getters['Files/publicLinkPassword']
-
-  await store.dispatch('loadCapabilities', {
-    publicToken,
-    ...(publicLinkPassword && { user: 'public', password: publicLinkPassword })
-  })
-
-  store.commit('SET_USER_READY', true)
-}
-
 export default {
   name: 'ExternalApp',
 
@@ -79,8 +61,7 @@ export default {
     errorMessage: '',
     appUrl: '',
     method: '',
-    formParameters: {},
-    fileId: ''
+    formParameters: {}
   }),
   computed: {
     ...mapGetters(['getToken', 'capabilities', 'configuration']),
@@ -99,26 +80,20 @@ export default {
       })
     },
     appName() {
-      return this.$route.params.appName
+      return this.$route.query.app
+    },
+    fileName() {
+      return this.currentFileContext.path.split('/').pop()
     }
   },
   mounted() {
-    if (this.$route.params.filePath && this.$route.params.appName)
-      document.title = `${this.$route.params.filePath.split('/').pop()} - ${
-        this.$route.params.appName
-      }`
-    else if (this.$route.params.appName) document.title = `${this.$route.params.appName}`
-    else if (this.$route.params.filePath) document.title = `${this.$route.params.filePath}`
+    const appNameTitle = this.appName ? `${this.appName} - ` : ''
+    document.title = `${this.fileName} - ${appNameTitle}${this.configuration.currentTheme.general.name}`
   },
   async created() {
-    await unauthenticatedUserReady(this.$router, this.$store)
-
     this.loading = true
-
-    // get filePath and fileId
-    this.filePath = this.currentFileContext.path
-    this.fileId = this.getFileInfo().id
-    console.log('filePath, fileId', this.filePath, this.fileId)
+    const filePath = this.currentFileContext.path
+    const fileInfo = await this.getFileInfoResource(filePath)
 
     // build headers with respect to the actual auth situation
     const { 'public-token': publicToken } = this.$route.query
@@ -142,7 +117,7 @@ export default {
     const url =
       configUrl +
       appOpenUrl +
-      `?file_id=${this.fileId}` +
+      `?file_id=${fileInfo.fileId}` +
       (this.appName ? `&app_name=${this.appName}` : '')
 
     const response = await fetch(url, {
@@ -178,8 +153,9 @@ export default {
     this.loading = false
   },
   methods: {
-    async getFileInfo() {
-      const file = await this.getFileInfo(this.filePath, DavProperties.Default)
+    // FIXME make getFileInfo return a Resource instead?
+    async getFileInfoResource(path) {
+      const file = await this.getFileInfo(path, DavProperties.Default)
       return buildResource(file)
     }
   }

@@ -130,7 +130,7 @@ export default {
   methods: {
     ...mapActions(['openFile']),
 
-    $_fileActions__routeOpts(app, filePath, fileId, mode) {
+    $_fileActions__routeOpts(app, filePath, fileId, mode, query = {}) {
       const route = this.$route
 
       return {
@@ -140,7 +140,10 @@ export default {
           fileId,
           mode
         },
-        query: routeToContextQuery(route)
+        query: {
+          ...routeToContextQuery(route),
+          ...query
+        }
       }
     },
 
@@ -232,7 +235,7 @@ export default {
       if (resources.length !== 1) {
         return []
       }
-      const { mimeType, fileId, webDavPath } = resources[0]
+      const { mimeType, webDavPath } = resources[0]
       const mimeTypes = this.$store.getters['External/mimeTypes'] || []
       if (
         mimeType === undefined ||
@@ -259,20 +262,23 @@ export default {
           class: `oc-files-actions-${app.name}-trigger`,
           isEnabled: () => true,
           canBeDefault: defaultApplication === app.name,
-          handler: () => this.$_fileActions_openLink(app.name, webDavPath),
+          handler: () => this.$_fileActions_openLink(app.name, webDavPath, app.name),
           label: () => this.$gettextInterpolate(label, { appName: app.name })
         }
       })
     },
 
-    $_fileActions_openLink(appName, filePath) {
+    $_fileActions_openLink(appName, filePath, app) {
       const routeOpts = this.$_fileActions__routeOpts(
         {
           routeName: 'external-apps'
         },
         filePath,
         undefined,
-        undefined
+        undefined,
+        {
+          app: app
+        }
       )
 
       routeOpts.params.appName = appName
