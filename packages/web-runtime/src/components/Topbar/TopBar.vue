@@ -14,7 +14,7 @@
       <portal-target name="app.runtime.header" multiple></portal-target>
     </div>
     <div class="oc-topbar-right oc-flex oc-flex-middle oc-flex-between">
-      <tour v-if="!isLightweight"/>
+      <tour v-if="!isLightweight && !isPublicLocation" />
       <theme-switcher v-if="darkThemeAvailable" />
       <feedback-link v-if="isFeedbackLinkEnabled" />
       <notifications v-if="isNotificationBellEnabled" />
@@ -33,6 +33,8 @@ import Notifications from './Notifications.vue'
 import FeedbackLink from './FeedbackLink.vue'
 import ThemeSwitcher from './ThemeSwitcher.vue'
 import Tour from './Tour/Tour.vue'
+import { isLocationPublicActive } from './../../../../web-app-files/src/router/index'
+import { useActiveLocation } from './../../../../web-app-files/src/composables'
 
 export default {
   components: {
@@ -54,6 +56,11 @@ export default {
       type: [Array, Boolean],
       required: false,
       default: () => []
+    }
+  },
+  setup() {
+    return {
+      isPublicLocation: useActiveLocation(isLocationPublicActive, 'files-public-files')
     }
   },
   computed: {
