@@ -30,6 +30,9 @@
 import { mapGetters } from 'vuex'
 import ErrorScreen from './components/ErrorScreen.vue'
 import LoadingScreen from './components/LoadingScreen.vue'
+import { DavProperties } from 'web-pkg/src/constants'
+import { useAppDefaults } from 'web-pkg/src/composables'
+import { buildResource } from '../../web-app-files/src/helpers/resources'
 
 // FIXME: hacky, get rid asap, just a workaround
 // same as packages/web-app-files/src/views/PublicFiles.vue
@@ -56,6 +59,13 @@ export default {
     ErrorScreen,
     LoadingScreen
   },
+  setup() {
+    return {
+      ...useAppDefaults({
+        applicationName: 'external'
+      })
+    }
+  },
 
   data: () => ({
     loading: false,
@@ -63,7 +73,9 @@ export default {
     errorMessage: '',
     appUrl: '',
     method: '',
-    formParameters: {}
+    formParameters: {},
+    fileId: '',
+    fileInfo: ''
   }),
   computed: {
     ...mapGetters(['getToken', 'capabilities', 'configuration']),
@@ -84,17 +96,22 @@ export default {
     appName() {
       return this.$route.params.appName
     },
-    fileId() {
-      return this.$route.params.fileId
+    fileName() {
+      return this.filePath.split('/').pop()
     }
-  },
-  mounted() {
-    document.title = this.$route.params.appName
   },
   async created() {
     await unauthenticatedUserReady(this.$router, this.$store)
 
     this.loading = true
+
+    // get filePath & fileId
+    this.getfilePath()
+    await this.returnFileInfo()
+    this.fileId = this.fileInfo.id
+
+    // toDo: implement in helpers
+    this.setDocumentTitle()
 
     // build headers with respect to the actual auth situation
     const { 'public-token': publicToken } = this.$route.query
@@ -152,6 +169,28 @@ export default {
       this.$nextTick(() => this.$refs.subm.click())
     }
     this.loading = false
+  },
+  methods: {
+    getfilePath() {
+      // remove appName from path
+      const path = this.currentFileContext.path.split('/')
+      path.pop()
+      this.filePath = path.join('/')
+    },
+    returnFileInfo() {
+      return this.getFileInfo(this.filePath, DavProperties.Default)
+        .then((v) => {
+          this.fileInfo = buildResource(v)
+        })
+        .catch((error) => {
+          this.error(error)
+        })
+    },
+    setDocumentTitle() {
+      if (this.fileName && this.appName) document.title = `${this.fileName} - ${this.appName}`
+      else if (this.appName) document.title = `${this.appName}`
+      else if (this.fileName) document.title = `${this.fileName}`
+    }
   }
 }
 </script>
