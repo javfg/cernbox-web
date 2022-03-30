@@ -153,13 +153,6 @@ export default {
     padding-left: var(--oc-space-small);
     width: 100%;
 
-    &:focus,
-    &:hover {
-      background-color: var(--oc-color-background-hover);
-      color: var(--oc-color-swatch-passive-default);
-      text-decoration: none;
-    }
-
     .profile-info-wrapper {
       text-align: left;
     }

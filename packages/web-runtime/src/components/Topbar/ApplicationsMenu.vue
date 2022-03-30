@@ -80,13 +80,6 @@ export default {
     justify-content: flex-start;
     width: 100%;
 
-    &:focus,
-    &:hover {
-      background-color: var(--oc-color-background-hover);
-      color: var(--oc-color-swatch-passive-default);
-      text-decoration: none;
-    }
-
     .icon-box {
       display: inline-flex;
       justify-content: center;
