@@ -32,6 +32,9 @@ const actions = {
     // set userReady to false
     context.commit('SET_USER_READY', false)
 
+    // reset store
+    this.reset()
+
     // clear oidc client state
     vueAuthInstance.clearLoginState()
   },
