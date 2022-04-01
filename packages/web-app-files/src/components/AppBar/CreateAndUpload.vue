@@ -131,6 +131,7 @@ import MixinFileActions, { EDITOR_MODE_CREATE } from '../../mixins/fileActions'
 import { buildResource, buildWebDavFilesPath, buildWebDavSpacesPath } from '../../helpers/resources'
 import { isLocationPublicActive, isLocationSpacesActive } from '../../router'
 import { useActiveLocation } from '../../composables'
+import { useAppDefaults } from 'web-pkg/src/composables'
 
 import { DavProperties, DavProperty } from 'web-pkg/src/constants'
 
@@ -150,7 +151,10 @@ export default {
       isPersonalLocation: useActiveLocation(isLocationSpacesActive, 'files-spaces-personal-home'),
       isPublicLocation: useActiveLocation(isLocationPublicActive, 'files-public-files'),
       isSpacesProjectsLocation: useActiveLocation(isLocationSpacesActive, 'files-spaces-projects'),
-      isSpacesProjectLocation: useActiveLocation(isLocationSpacesActive, 'files-spaces-project')
+      isSpacesProjectLocation: useActiveLocation(isLocationSpacesActive, 'files-spaces-project'),
+      ...useAppDefaults({
+        applicationName: 'files'
+      })
     }
   },
   data: () => ({
