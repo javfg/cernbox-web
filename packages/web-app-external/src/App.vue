@@ -81,35 +81,16 @@ export default {
     },
     appName() {
       return this.$route.query.app
-    },
-    fileName() {
-      return this.currentFileContext.fileName
     }
   },
   mounted() {
     const appNameTitle = this.appName ? `${this.appName} - ` : ''
-    document.title = `${this.fileName} - ${appNameTitle}${this.configuration.currentTheme.general.name}`
+    document.title = `${this.currentFileContext.fileName} - ${appNameTitle}${this.configuration.currentTheme.general.name}`
   },
   async created() {
     this.loading = true
     const filePath = this.currentFileContext.path
     const fileInfo = await this.getFileInfoResource(filePath)
-
-    // build headers with respect to the actual auth situation
-    const { 'public-token': publicToken } = this.$route.query
-    const publicLinkPassword = this.publicLinkPassword
-    const accessToken = this.getToken
-    const headers = {
-      'X-Requested-With': 'XMLHttpRequest',
-      ...(publicToken && { 'public-token': publicToken }),
-      ...(publicLinkPassword && {
-        Authorization:
-          'Basic ' + Buffer.from(['public', publicLinkPassword].join(':')).toString('base64')
-      }),
-      ...(accessToken && {
-        Authorization: 'Bearer ' + accessToken
-      })
-    }
 
     // fetch iframe params for app and file
     const configUrl = this.configuration.server
@@ -120,10 +101,7 @@ export default {
       `?file_id=${fileInfo.fileId}` +
       (this.appName ? `&app_name=${this.appName}` : '')
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers
-    })
+    const response = await this.makeRequest('POST', url)
 
     if (response.status !== 200) {
       this.errorMessage = response.message

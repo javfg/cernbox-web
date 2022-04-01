@@ -1,7 +1,7 @@
 import get from 'lodash-es/get'
 import { mapGetters, mapActions, mapState } from 'vuex'
 
-import { isAuthenticatedRoute, isLocationTrashActive } from '../router'
+import { isLocationTrashActive } from '../router'
 import { routeToContextQuery } from 'web-pkg/src/composables/appDefaults'
 import AcceptShare from './actions/acceptShare'
 import Copy from './actions/copy'
@@ -130,7 +130,7 @@ export default {
   methods: {
     ...mapActions(['openFile']),
 
-    $_fileActions__routeOpts(app, filePath, fileId, mode, query = {}) {
+    $_fileActions__routeOpts(app, filePath, fileId, mode) {
       const route = this.$route
 
       return {
@@ -140,10 +140,7 @@ export default {
           fileId,
           mode
         },
-        query: {
-          ...routeToContextQuery(route),
-          ...query
-        }
+        query: routeToContextQuery(route)
       }
     },
 
@@ -262,33 +259,25 @@ export default {
           class: `oc-files-actions-${app.name}-trigger`,
           isEnabled: () => true,
           canBeDefault: defaultApplication === app.name,
-          handler: () => this.$_fileActions_openLink(app.name, webDavPath, app.name),
+          handler: () => this.$_fileActions_openLink(app.name, webDavPath),
           label: () => this.$gettextInterpolate(label, { appName: app.name })
         }
       })
     },
 
-    $_fileActions_openLink(appName, filePath, app) {
+    $_fileActions_openLink(appName, filePath) {
       const routeOpts = this.$_fileActions__routeOpts(
         {
           routeName: 'external-apps'
         },
         filePath,
         undefined,
-        undefined,
-        {
-          app: app
-        }
+        undefined
       )
 
-      routeOpts.params.appName = appName
-
       routeOpts.query = {
-        ...routeOpts.query,
-        // public-token retrieval is weak, same as packages/web-app-files/src/index.js:106
-        ...(!isAuthenticatedRoute(this.$route) && {
-          'public-token': (this.$route.params.item || '').split('/')[0]
-        })
+        app: appName,
+        ...routeOpts.query
       }
 
       // TODO: Let users configure whether to open in same/new tab (`_blank` vs `_self`)
