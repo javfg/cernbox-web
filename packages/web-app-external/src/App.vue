@@ -83,7 +83,7 @@ export default {
       return this.$route.query.app
     },
     fileName() {
-      return this.currentFileContext.path.split('/').pop()
+      return this.currentFileContext.fileName
     }
   },
   mounted() {
