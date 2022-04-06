@@ -159,7 +159,6 @@ export default defineComponent({
 
     isLightweight() {
       const windowVue = window.Vue as any
-      console.log('user', windowVue.$store.getters.user)
       return windowVue.$store.getters.user.usertype === 'lightweight'
     },
     isHomeRoute() {
@@ -248,6 +247,12 @@ export default defineComponent({
 
     fetchResources,
 
+    onNewProjectButtonClick() {
+      window.open(
+        'https://cern.service-now.com/service-portal?id=sc_cat_item&name=EOS-projet-space&se=CERNBox-Service',
+        '_blank'
+      )
+    },
     async fileDropped(fileIdTarget) {
       const selected = [...this.selectedResources]
       const targetInfo = this.paginatedResources.find((e) => e.id === fileIdTarget)

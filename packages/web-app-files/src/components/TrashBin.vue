@@ -1,6 +1,9 @@
 <template>
   <div>
     <app-bar :breadcrumbs="breadcrumbs" :has-bulk-actions="true" />
+    <h2 v-if="$route.query.project" class="oc-px-m oc-py-s">
+      Trashbin for project "{{ $route.query.name }}"
+    </h2>
     <app-loading-spinner v-if="loadResourcesTask.isRunning" />
     <template v-else>
       <no-content-message

@@ -1,7 +1,7 @@
 import get from 'lodash-es/get'
 import { mapGetters, mapActions, mapState } from 'vuex'
 
-import { isLocationTrashActive } from '../router'
+import { isLocationTrashActive, isLocationCommonActive } from '../router'
 import { routeToContextQuery } from 'web-pkg/src/composables/appDefaults'
 import AcceptShare from './actions/acceptShare'
 import Copy from './actions/copy'
@@ -95,6 +95,7 @@ export default {
               if (resources.length !== 1) {
                 return false
               }
+              if (isLocationCommonActive(this.$router, 'files-common-projects-trash')) return false
 
               if (resources[0].extension && editor.extension) {
                 return resources[0].extension.toLowerCase() === editor.extension.toLowerCase()
