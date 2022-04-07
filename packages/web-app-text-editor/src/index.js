@@ -40,11 +40,6 @@ const appInfo = {
     },
     {
       extension: 'md',
-      newFileMenu: {
-        menuTitle($gettext) {
-          return $gettext('Markdown file')
-        }
-      },
       ...fileExtensionConfig
     }
   ]
