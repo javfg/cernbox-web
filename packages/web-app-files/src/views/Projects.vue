@@ -22,7 +22,7 @@
     <app-loading-spinner v-if="loadResourcesTask.isRunning" />
     <template v-else>
       <no-content-message
-        v-if="!hasShares"
+        v-if="!hasProjects"
         id="files-shared-with-me-shares-empty"
         class="files-empty oc-flex-stretch"
         icon="group"
@@ -56,7 +56,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import AppBar from '../components/AppBar/AppBar.vue'
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
 import ResourceTable from '../components/FilesList/ResourceTable.vue'
@@ -68,12 +68,11 @@ import MixinMountSideBar from '../mixins/sidebar/mountSideBar'
 import { VisibilityObserver } from 'web-pkg/src/observer'
 import { ImageDimension, ImageType } from '../constants'
 import { useFileListHeaderPosition, useSort } from '../composables'
-import { useStore } from 'web-pkg/src/composables'
+import { useStore, useCapabilityFilesSharingResharing } from 'web-pkg/src/composables'
 import debounce from 'lodash-es/debounce'
 
 import AppLoadingSpinner from 'web-pkg/src/components/AppLoadingSpinner.vue'
 import NoContentMessage from 'web-pkg/src/components/NoContentMessage.vue'
-import ListInfo from '../components/FilesList/ListInfo.vue'
 import ContextActions from '../components/FilesList/ContextActions.vue'
 import { useTask } from 'vue-concurrency'
 import { ShareStatus } from '../helpers/share'
@@ -88,7 +87,6 @@ export default {
     ResourceTable,
     NoContentMessage,
     AppLoadingSpinner,
-    ListInfo,
     ContextActions
   },
 
@@ -97,24 +95,6 @@ export default {
   setup() {
     const store = useStore()
     const { y: fileListHeaderY } = useFileListHeaderPosition()
-    const storeItems = computed(() => store.getters['Files/activeFiles'] || [])
-    const fields = computed(() => {
-      return determineSortFields(unref(storeItems)[0])
-    })
-
-    // shares depending on view mode
-    const shares = computed(() => unref(storeItems))
-    const {
-      sortBy,
-      sortDir,
-      items: activeFiles,
-      handleSort
-    } = useSort({
-      items: shares,
-      fields,
-      sortByQueryName: 'shares-sort-by',
-      sortDirQueryName: 'shares-sort-dir'
-    })
 
     const loadResourcesTask = useTask(function* (signal, ref) {
       ref.CLEAR_CURRENT_FILES_LIST()
@@ -146,37 +126,65 @@ export default {
       //     }
       //   ]
       // }
+
       const recievedResources = []
       if (data && data.projects) {
         data.projects.forEach((p, i) => {
           recievedResources.push({
-            name: '/' + p.name.charAt(0) + '/' + p.name,
             id: i + p.name,
             type: 'dir',
-            file_target: '/eos/project/' + p.name.charAt(0) + '/' + p.name,
+
+            uid_owner: 'einstein',
+            displayname_owner: 'Albert Einstein',
+            additional_info_owner: 'einstein@example.org',
+            stime: 1649346512,
+            parent: '',
+            expiration: '',
+            token: '',
+            uid_file_owner: 'einstein',
+            displayname_file_owner: 'Albert Einstein',
+            additional_info_file_owner: 'einstein@example.org',
+            state: 2,
             path: '/eos/project/' + p.name.charAt(0) + '/' + p.name,
             item_type: 'folder',
             mimetype: 'httpd/unix-directory',
-            additional_info_file_owner: 'admin@example.org',
-            additional_info_owner: 'admin@example.org',
-            displayname_file_owner: 'Admin',
-            displayname_owner: 'Admin',
-            state: 2,
-            stime: 23233435
+            storage_id: 'shared::/Shares/a',
+            storage: 0,
+            item_source: i + p.name,
+            file_source: i + p.name,
+            file_parent: '',
+            file_target: '/eos/project/' + p.name.charAt(0) + '/' + p.name,
+            share_with: 'admin',
+            share_with_displayname: 'Admin',
+            share_with_additional_info: 'admin@example.org',
+            mail_send: 0,
+            name: '/' + p.name.charAt(0) + '/' + p.name,
+            sharedWith: [
+              {
+                username: 'admin',
+                displayName: 'Admin',
+                name: 'Admin',
+                shareType: 0
+              }
+            ]
           })
         })
       }
 
       let resources = []
 
+      const hasResharing = useCapabilityFilesSharingResharing(ref.$store)
+      const configuration = ref.$store.getters.configuration
+      const token = ref.$store.getters.getToken
+
       try {
         if (recievedResources.length) {
           resources = aggregateResourceShares(
             recievedResources,
-            true,
-            !ref.isOcis,
-            ref.configuration.server,
-            ref.getToken
+            false,
+            unref(hasResharing),
+            configuration.server,
+            token
           )
         }
       } catch (error) {
@@ -191,9 +199,28 @@ export default {
         delete r.sdate
         delete r.status
         delete r.sharedWith
+        delete r.indicators
       })
 
-      ref.LOAD_FILES({ currentFolder: null, files: resources })
+      ref.$store.commit('Files/LOAD_FILES', {
+        currentFolder: null,
+        files: resources
+      })
+    })
+    const storeItems = computed(() => store.getters['Files/activeFiles'] || [])
+    const fields = computed(() => {
+      return determineSortFields(unref(storeItems)[0])
+    })
+    const {
+      sortBy,
+      sortDir,
+      items: activeFiles,
+      handleSort
+    } = useSort({
+      items: storeItems,
+      fields,
+      sortByQueryName: 'shares-sort-by',
+      sortDirQueryName: 'shares-sort-dir'
     })
 
     return {
@@ -218,52 +245,9 @@ export default {
     ...mapState('Files/sidebar', { sidebarClosed: 'closed' }),
 
     isLightweight() {
-      const windowVue = window.Vue
-      return windowVue.$store.getters.user.usertype === 'lightweight'
-    },
-    isProjectsRoute() {
-      const windowVue = window.Vue
-      return windowVue.$route.name === 'files-common-projects'
+      return this.$store.getters.user.usertype === 'lightweight'
     },
 
-    groupingSettings() {
-      return {
-        groupingBy: 'Shared date',
-        showGroupingOptions: true,
-        groupingFunctions: {
-          'Share owner': function (row) {
-            return row.owner[0].displayName
-          },
-          'Name alphabetically': function (row) {
-            if (!isNaN(row.name.charAt(0))) return '#'
-            if (row.name.charAt(0) === '.') return row.name.charAt(1).toLowerCase()
-            return row.name.charAt(0).toLowerCase()
-          },
-          'Shared date': function (row) {
-            const interval1 = new Date()
-            interval1.setDate(interval1.getDate() - 7)
-            const interval2 = new Date()
-            interval2.setDate(interval2.getDate() - 30)
-            if (row.sdate > interval1.getTime()) {
-              return 'Recent'
-            } else if (row.sdate > interval2.getTime()) {
-              return 'This Month'
-            } else return 'Older'
-          }
-        },
-        functionColMappings: {
-          'Share owner': 'owner',
-          'Shared date': 'sdate'
-        }
-      }
-    },
-    groupingSettingsPreview() {
-      return {
-        previewAmount: 3
-      }
-    },
-
-    // accepted or declined shares
     selected: {
       get() {
         return this.selectedFiles
@@ -275,12 +259,12 @@ export default {
     },
 
     sharesEmptyMessage() {
-      return this.$gettext("You are not collaborating on other people's resources.")
+      return this.$gettext('You are not collaborating on any projects.')
     },
-    hasShares() {
-      return this.sharesCount > 0
+    hasProjects() {
+      return this.projectsCount > 0
     },
-    sharesCount() {
+    projectsCount() {
       return this.activeFiles.length
     },
     sharesCountFiles() {

@@ -26,7 +26,10 @@ export default {
             ) {
               return false
             }
-            if (isLocationCommonActive(this.$router, 'files-common-projects-trash')) {
+            if (
+              isLocationCommonActive(this.$router, 'files-common-projects-trash') ||
+              isLocationCommonActive(this.$router, 'files-common-projects')
+            ) {
               return false
             }
             if (resources.length !== 1) {
