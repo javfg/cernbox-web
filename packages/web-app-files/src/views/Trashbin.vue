@@ -17,7 +17,9 @@ export default {
   },
   computed: {
     breadcrumbs() {
-      const personalRouteName = this.hasSpaces
+      const personalRouteName = this.$route.query?.name
+        ? this.$route.query.name
+        : this.hasSpaces
         ? this.$gettext('Personal')
         : this.$gettext('All files')
 
