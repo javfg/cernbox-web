@@ -50,8 +50,10 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Shepherd from 'shepherd.js'
+import { isLocationPublicActive } from '../../../../../web-app-files/src/router/index'
+import { useActiveLocation } from '../../../../../web-app-files/src/composables'
 
 export default {
   props: {
@@ -62,6 +64,11 @@ export default {
     route: {
       type: String,
       required: true
+    }
+  },
+  setup() {
+    return {
+      isPublicLocation: useActiveLocation(isLocationPublicActive, 'files-public-files')
     }
   },
   data() {
@@ -89,7 +96,7 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      if (!localStorage.getItem('web-version')) {
+      if (!localStorage.getItem('web-version') && !this.isPublicLocation) {
         localStorage.setItem('web-version', Date.now())
         this.startTourNewFeatures()
       }
