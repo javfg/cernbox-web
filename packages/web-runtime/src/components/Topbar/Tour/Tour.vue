@@ -59,11 +59,13 @@ export default {
   props: {
     resources: {
       type: Array,
-      required: true
+      required: false,
+      default: null
     },
     route: {
       type: String,
-      required: true
+      required: false,
+      default: null
     }
   },
   setup() {
