@@ -5,6 +5,7 @@ import { Store } from 'vuex'
 import VueRouter from 'vue-router'
 import { VueConstructor } from 'vue'
 import { loadTheme } from '../helpers/theme'
+import { loadTours } from '../helpers/tours'
 import OwnCloud from 'owncloud-sdk'
 import { sync as routerSync } from 'vuex-router-sync'
 import getTextPlugin from 'vue-gettext'
@@ -203,6 +204,11 @@ export const announceTheme = async ({
     currentThemeName.value = useDefaultThemeName()
   }
   await store.dispatch('loadTheme', { theme: theme[unref(currentThemeName)] || theme.default })
+
+  const { tours } = await loadTours(runtimeConfiguration?.tours)
+  await store.dispatch('loadTours', { tours })
+  await store.dispatch('setTours', tours)
+  await store.dispatch('setToursCurrentLanguage')
 
   vue.use(designSystem, {
     tokens: store.getters.theme.designTokens

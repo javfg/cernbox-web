@@ -14,6 +14,7 @@ const state = {
   openIdConnect: {
     authority: ''
   },
+  tours: [],
   themes: [],
   currentTheme: {
     general: {
@@ -75,6 +76,9 @@ const actions = {
   },
   loadThemes(context, { theme }) {
     context.commit('LOAD_THEMES', theme)
+  },
+  loadTours(context, { tours }) {
+    context.commit('LOAD_TOURS', tours)
   }
 }
 
@@ -99,6 +103,9 @@ const mutations = {
   },
   LOAD_THEMES(state, theme) {
     state.themes = theme
+  },
+  LOAD_TOURS(state, tours) {
+    state.tours = tours
   }
 }
 
