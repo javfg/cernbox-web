@@ -9,15 +9,19 @@ export const empty = {
 export const shareInviteCollaboratorHelp = {
   text: $gettext('Invite persons or groups to access this file or folder.'),
   list: [
-    $gettext(
-      'To search for service or secondary accounts prefix the username with "a:" (like "a:doe") and for guest accounts prefix the username with "l:" (like "l:doe")'
-    ),
     $gettext('Enter a name or group to share this item'),
     $gettext(
       'If you share a folder,  all of its contents and subfolders will be shared with the entered persons or groups'
     ),
     $gettext('Invited persons or groups will be notified via e-mail or in-app notification'),
     $gettext('Invited persons can not see who else has access')
+  ]
+}
+export const shareInviteCollaboratorHelpCern = {
+  list: [
+    $gettext(
+      'To search for service or secondary accounts prefix the username with "a:" (like "a:doe") and for guest accounts prefix the username with "l:" (like "l:doe")'
+    )
   ]
 }
 export const shareSpaceAddMemberHelp = {

@@ -95,6 +95,7 @@ import { clientService } from 'web-pkg/src/services'
 import { useCapabilityFilesSharingResharing } from 'web-pkg/src/composables'
 import {
   shareInviteCollaboratorHelp,
+  shareInviteCollaboratorHelpCern,
   shareSpaceAddMemberHelp
 } from '../../../../../helpers/contextualHelpers.js'
 
@@ -147,7 +148,13 @@ export default {
     },
 
     inviteCollaboratorHelp() {
-      return shareInviteCollaboratorHelp
+      const cernFeatures = !!this.configuration?.options?.cernFeatures
+      return cernFeatures
+        ? {
+            text: shareInviteCollaboratorHelp.text,
+            list: [...shareInviteCollaboratorHelp.list, ...shareInviteCollaboratorHelpCern.list]
+          }
+        : shareInviteCollaboratorHelp
     },
 
     spaceAddMemberHelp() {
@@ -155,14 +162,10 @@ export default {
     },
 
     inviteDescriptionMessage() {
-      if (this.capabilities.files_sharing.federation?.outgoing === true) {
-        return this.$gettext('Add new person by name, email, service/secondary/guest accounts, or federation IDs')
-      }
-      return this.$gettext('Add new person by name, email or service/secondary/guest accounts')
-    },
-
-    $_announcementWhenCollaboratorAdded() {
-      return this.$gettext('Person was added')
+      const cernFeatures = !!this.configuration?.options?.cernFeatures
+      return cernFeatures
+        ? this.$gettext('Add new person by name, email or service/secondary/guest accounts')
+        : this.$gettext('Add new person by name, email or federation IDs')
     },
 
     $_isValid() {
