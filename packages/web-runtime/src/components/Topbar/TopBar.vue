@@ -14,7 +14,6 @@
       <portal-target name="app.runtime.header" multiple></portal-target>
     </div>
     <div class="oc-topbar-right oc-flex oc-flex-middle oc-flex-between">
-      <tours v-if="toursAllowed" />
       <theme-switcher v-if="darkThemeAvailable" />
       <feedback-link v-if="isFeedbackLinkEnabled" v-bind="feedbackLinkOptions" />
       <notifications v-if="isNotificationBellEnabled" />
@@ -32,7 +31,6 @@ import UserMenu from './UserMenu.vue'
 import Notifications from './Notifications.vue'
 import FeedbackLink from './FeedbackLink.vue'
 import ThemeSwitcher from './ThemeSwitcher.vue'
-import Tours from './Tours/Tours.vue'
 
 export default {
   components: {
@@ -40,8 +38,7 @@ export default {
     FeedbackLink,
     Notifications,
     ThemeSwitcher,
-    UserMenu,
-    Tours
+    UserMenu
   },
   mixins: [NavigationMixin],
   props: {
@@ -56,30 +53,8 @@ export default {
       default: () => []
     }
   },
-  setup() {
-    return {
-      isPublicLocation:
-        useActiveLocation(isLocationPublicActive, 'files-public-files') ||
-        this.$route.name === 'files-operations-resolver-public-link'
-    }
-  },
   computed: {
-    ...mapGetters(['configuration', 'user', 'tours']),
-
-    isLightweight() {
-      return window.Vue.$store.getters.user.usertype === 'lightweight'
-    },
-
-    toursAllowed() {
-      let isLocationToShow = true
-      if (
-        this.$route.name === 'files-operations-resolver-public-link' ||
-        this.$route.name === 'files-public-files'
-      )
-        isLocationToShow = false
-
-      return this.tours && !this.isLightweight && isLocationToShow
-    },
+    ...mapGetters(['configuration', 'user']),
 
     activeRoutePath() {
       return this.$router.resolve(this.$route).location.path

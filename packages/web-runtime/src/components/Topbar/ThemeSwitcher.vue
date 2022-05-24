@@ -5,7 +5,6 @@
     :aria-label="buttonLabel"
     appearance="raw"
     variation="inverse"
-    style="white-space: nowrap"
     @click="toggleTheme"
   >
     <span class="oc-visible@s" :aria-label="switchLabel" v-text="switchText" />

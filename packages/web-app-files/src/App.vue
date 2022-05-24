@@ -16,6 +16,7 @@
       @selectPanel="setActiveSidebarPanel"
       @close="closeSidebar"
     />
+    <tour-guide />
   </main>
 </template>
 <script lang="ts">
@@ -23,10 +24,12 @@ import Mixins from './mixins'
 import { mapActions, mapState } from 'vuex'
 import SideBar from './components/SideBar/SideBar.vue'
 import { defineComponent } from '@vue/composition-api'
+import TourGuide from './components/TourGuide.vue'
 
 export default defineComponent({
   components: {
-    SideBar
+    SideBar,
+    TourGuide
   },
   mixins: [Mixins],
   computed: {
@@ -54,7 +57,6 @@ export default defineComponent({
       this.delayForScreenreader(() => this.$refs.filesListWrapper.focus())
     })
   },
-
   methods: {
     ...mapActions('Files', ['resetFileSelection']),
     ...mapActions('Files/sidebar', {
