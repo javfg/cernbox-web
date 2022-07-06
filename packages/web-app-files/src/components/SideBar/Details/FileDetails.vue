@@ -78,7 +78,7 @@
             />
           </td>
         </tr>
-        <tr v-if="runningOnEos">
+        <tr v-if="runningOnEos && !isPublic">
           <th scope="col" class="oc-pr-s" v-text="eosPathLabel" />
           <td>
             <div class="oc-flex oc-flex-middle oc-flex-between oc-width-1-1">
@@ -106,7 +106,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="cernFeatures && getSambaPath(file.path)">
+        <tr v-if="cernFeatures && getSambaPath(file.path) && !isPublic">
           <th scope="col" class="oc-pr-s" v-text="sambaPathLabel" />
           <td>
             <div class="oc-flex oc-flex-middle oc-flex-between oc-width-1-1">
@@ -134,7 +134,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="runningOnEos">
+        <tr v-if="runningOnEos && !isPublic">
           <th scope="col" class="oc-pr-s" v-text="directLinkLabel" />
           <td>
             <div class="oc-flex oc-flex-middle oc-flex-between oc-width-1-1">
@@ -245,6 +245,9 @@ export default defineComponent({
         this.showShares ||
         this.showVersions
       )
+    },
+    isPublic() {
+      return !isAuthenticatedRoute(this.$route)
     },
     noContentText() {
       return this.$gettext('No information to display')
