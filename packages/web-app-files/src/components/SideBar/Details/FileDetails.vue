@@ -134,7 +134,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="runningOnEos && !isPublic">
+        <tr v-if="runningOnEos">
           <th scope="col" class="oc-pr-s" v-text="directLinkLabel" />
           <td>
             <div class="oc-flex oc-flex-middle oc-flex-between oc-width-1-1">
@@ -318,7 +318,9 @@ export default defineComponent({
       return this.file.owner?.[0].additionalInfo
     },
     directLink() {
-      return `${this.configuration.server}files/spaces${encodePath(this.file.path)}`
+      return !this.isPublic
+        ? `${this.configuration.server}files/spaces${encodePath(this.file.path)}`
+        : `${this.configuration.server.replace(/\/+$/, '')}${this.file.downloadURL}`
     },
     directLinkLabel() {
       return this.$gettext('Direct link')
@@ -327,10 +329,10 @@ export default defineComponent({
       return this.$gettext('Copy direct link')
     },
     eosPathLabel() {
-      return this.$gettext('EOS Path')
+      return this.$gettext('FUSE Path')
     },
     copyEosPathLabel() {
-      return this.$gettext('Copy EOS path')
+      return this.$gettext('Copy FUSE path')
     },
     sambaPathLabel() {
       return this.$gettext('Windows Path')
@@ -475,8 +477,8 @@ export default defineComponent({
       this.copiedEos = true
       this.clipboardSuccessHandler()
       this.showMessage({
-        title: this.$gettext('EOS path copied'),
-        desc: this.$gettext('The EOS path has been copied to your clipboard.')
+        title: this.$gettext('FUSE path copied'),
+        desc: this.$gettext('The FUSE path has been copied to your clipboard.')
       })
     },
     copySambaPathToClipboard() {
