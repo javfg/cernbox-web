@@ -123,7 +123,7 @@ export default defineComponent({
     unselectOnClick(e) {
       if (
         e.target?.id === 'files-view' ||
-        e.target?.className.includes('oc-files-appbar-batch-actions') ||
+        e.target?.className?.includes('oc-files-appbar-batch-actions') ||
         e.target?.className === 'oc-flex oc-flex-between'
       )
         this.resetFileSelection()
