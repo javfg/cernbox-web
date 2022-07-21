@@ -5,6 +5,7 @@ interface PublicPreviewUrlOptions {
   resource: {
     etag?: string
     downloadURL: string
+    name: string // CERNOnly
   }
   dimensions?: [number, number]
 }
@@ -26,8 +27,13 @@ export const publicPreviewUrl = async (options: PublicPreviewUrlOptions): Promis
     .filter(Boolean)
     .join('&')
 
-  const previewUrl = [url, combinedQuery].filter(Boolean).join('?')
-  const { status } = await clientService.httpUnAuthenticated.head(previewUrl)
+  const previewUrl = [url, combinedQuery]
+    .filter(Boolean)
+    .join('?') 
+    .replace('remote.php/dav', 'thumbnails')
+    .replace('/' + options.resource.name, '') // CERNOnly
+
+  const { status } = await clientService.httpUnAuthenticated.get(previewUrl) // CERNOnly
 
   if (status !== 404) {
     return previewUrl

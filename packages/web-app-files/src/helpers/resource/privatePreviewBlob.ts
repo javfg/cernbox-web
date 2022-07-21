@@ -27,14 +27,15 @@ export const privatePreviewBlob = async (
 
   const url = [
     options.server,
-    'remote.php/dav',
-    encodePath(options.resource.webDavPath),
+    'thumbnails/files',
+    encodePath(options.resource.path),
     '?',
     buildQueryString({
       etag: options.resource.etag,
       dimensions: options.dimensions
     })
-  ].join('')
+  ].join('') // CERNOnly
+
   try {
     const { data } = await clientService.httpAuthenticated(options.token).get(url, {
       responseType: 'blob'
