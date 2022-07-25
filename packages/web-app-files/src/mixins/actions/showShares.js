@@ -37,7 +37,7 @@ export default {
                 return false
               }
             }
-            if (this.$route === 'files-spaces-personal') {
+            if (this.$route?.name === 'files-spaces-personal') {
               return true
             }
             return canShare(resources[0], this.$store)
