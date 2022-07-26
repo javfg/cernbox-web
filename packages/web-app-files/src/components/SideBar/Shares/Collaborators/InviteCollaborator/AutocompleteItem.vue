@@ -36,14 +36,19 @@
       size="xlarge"
       :accessible-label="$gettext('User')"
     />
-    <div class="files-collaborators-autocomplete-user-text oc-text-truncate">
-      <span class="oc-text-bold files-collaborators-autocomplete-username" v-text="item.label" />
-      <span
+    <div class="files-collaborators-autocomplete-user-text oc-text-truncate flex-column">
+      <div class="oc-text-bold files-collaborators-autocomplete-username" v-text="item.label" />
+      <div
         v-if="item.value.shareWithAdditionalInfo"
         class="files-collaborators-autocomplete-additional-info"
-        v-text="`(${item.value.shareWithAdditionalInfo})`"
+        v-text="`${item.value.shareWithAdditionalInfo.split(' ')[0]}`"
       />
-      <div class="files-collaborators-autocomplete-share-type" v-text="$gettext(shareType.label)" />
+      <div
+        v-if="item.value.shareWithAdditionalInfo && item.value.shareWithAdditionalInfo.split(' ')[1]"
+        class="files-collaborators-autocomplete-additional-info"
+        v-text="`${item.value.shareWithAdditionalInfo.split(' ')[1].slice(1, -1)}`"
+      />
+      <div v-if="!isUser" class="files-collaborators-autocomplete-share-type" v-text="$gettext(shareType.label)" />
     </div>
   </div>
 </template>
@@ -98,5 +103,9 @@ export default {
 <style lang="scss">
 .vs__dropdown-option--highlight .files-recipient-suggestion-avatar svg {
   fill: white !important;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
 }
 </style>
