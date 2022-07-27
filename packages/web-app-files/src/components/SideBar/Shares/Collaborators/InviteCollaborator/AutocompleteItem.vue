@@ -7,7 +7,7 @@
     <avatar-image
       v-if="isUser || isSpace"
       class="oc-mr-s"
-      :width="48"
+      :width="32"
       :userid="item.value.shareWith"
       :user-name="item.label"
     />
@@ -39,16 +39,10 @@
     <div class="files-collaborators-autocomplete-user-text oc-text-truncate flex-column">
       <div class="oc-text-bold files-collaborators-autocomplete-username" v-text="item.label" />
       <div
-        v-if="item.value.shareWithAdditionalInfo"
-        class="files-collaborators-autocomplete-additional-info"
-        v-text="`${item.value.shareWithAdditionalInfo.split(' ')[0]}`"
+        v-if="additionalInfo"
+        class="files-collaborators-autocomplete-additional-info small"
+        v-text="additionalInfo"
       />
-      <div
-        v-if="item.value.shareWithAdditionalInfo && item.value.shareWithAdditionalInfo.split(' ')[1]"
-        class="files-collaborators-autocomplete-additional-info"
-        v-text="`${item.value.shareWithAdditionalInfo.split(' ')[1].slice(1, -1)}`"
-      />
-      <div v-if="!isUser" class="files-collaborators-autocomplete-share-type" v-text="$gettext(shareType.label)" />
     </div>
   </div>
 </template>
@@ -95,7 +89,26 @@ export default {
 
     collaboratorClass() {
       return `files-collaborators-search-${this.shareType.key}`
+    },
+
+    additionalInfo() {
+      if (!this.item.value.shareWithAdditionalInfo) {
+        return null
+      }
+
+      const infoPieces = this.item.value.shareWithAdditionalInfo.split(' ')
+
+      if (!this.isUser) {
+        return this.shareType.label
+      }
+
+      if (!infoPieces[1] || infoPieces[1] === '()') {
+        return infoPieces[0]
+      }
+
+      return `${infoPieces[0]} - ${infoPieces[1].slice(1, -1)}`
     }
+
   }
 }
 </script>
@@ -104,8 +117,13 @@ export default {
 .vs__dropdown-option--highlight .files-recipient-suggestion-avatar svg {
   fill: white !important;
 }
+
 .flex-column {
   display: flex;
   flex-direction: column;
+}
+
+.small {
+  font-size: 0.85rem;
 }
 </style>
