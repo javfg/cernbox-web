@@ -238,6 +238,7 @@ export default defineComponent({
         const sameRoute = to.name === from?.name && to.params?.storageId === from?.params?.storageId
         const sameItem = to.params?.item === from?.params?.item
         if (!sameRoute || !sameItem) {
+          this.loadResourcesTask.cancelAll()
           this.loadResourcesTask.perform(this, sameRoute)
         }
       },
