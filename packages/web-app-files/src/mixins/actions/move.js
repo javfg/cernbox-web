@@ -5,8 +5,10 @@ import {
   isLocationPublicActive,
   isLocationSpacesActive
 } from '../../router'
+import { mapGetters } from 'vuex'
 
 export default {
+  ...mapGetters(['homeFolder']),
   computed: {
     $_move_items() {
       return [
@@ -34,7 +36,7 @@ export default {
             }
 
             const moveDisabled = resources.some((resource) => {
-              return canBeMoved(resource, this.currentFolder.path) === false
+              return canBeMoved(resource, this.currentFolder.path) === false || resource.path === this.homeFolder
             })
             return !moveDisabled
           },
