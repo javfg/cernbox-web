@@ -17,7 +17,7 @@ interface CreateQuicklink {
 
 export const createQuicklink = async (args: CreateQuicklink): Promise<Share> => {
   const params: { [key: string]: unknown } = {
-    name: $gettext('Quicklink'),
+    name: '__quicklink',
     permissions: 1,
     quicklink: true
   }

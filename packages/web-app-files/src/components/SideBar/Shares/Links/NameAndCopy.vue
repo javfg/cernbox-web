@@ -44,6 +44,9 @@ export default {
   }),
   computed: {
     linkName() {
+      if (this.link.name === '__quicklink') {
+        return 'Quicklink'
+      }
       return this.link.name
     },
     copyBtnLabel() {

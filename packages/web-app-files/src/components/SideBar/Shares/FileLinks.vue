@@ -177,7 +177,9 @@ export default defineComponent({
     },
 
     quicklink() {
-      return this.currentFileOutgoingLinks.find((link) => link.quicklink === true)
+      return this.currentFileOutgoingLinks.find(
+        (link) => link.quicklink || link.name === '__quicklink' || link.name === 'Quicklink'
+      )
     },
 
     share() {
@@ -300,7 +302,9 @@ export default defineComponent({
 
     links() {
       return this.currentFileOutgoingLinks
-        .filter((link) => !link.quicklink)
+        .filter((link) => {
+          return !(link.quicklink || link.name === '__quicklink' || link.name === 'Quicklink')
+        })
         .map((share) => {
           share.key = 'direct-link-' + share.id
           return share

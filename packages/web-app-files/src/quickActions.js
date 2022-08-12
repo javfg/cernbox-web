@@ -1,5 +1,6 @@
 import { $gettext } from './gettext'
 import { createQuicklink } from './helpers/share'
+import copyToClipboard from 'copy-to-clipboard'
 
 export async function openNewCollaboratorsPanel(ctx) {
   await ctx.store.dispatch('Files/sidebar/openWithPanel', 'sharing-item#peopleShares')
@@ -69,18 +70,28 @@ export default {
     label: ($gettext) => $gettext('Copy quicklink'),
     icon: 'link',
     handler: async (ctx) => {
-      const passwordEnforced =
-        ctx.store.getters.capabilities?.files_sharing?.public?.password?.enforced_for?.read_only ===
-        true
-
-      if (passwordEnforced) {
-        return showQuickLinkPasswordModal(ctx, async (password) => {
-          await createQuicklink({ ...ctx, resource: ctx.item, password })
-          await ctx.store.dispatch('Files/sidebar/openWithPanel', 'sharing-item#linkShares')
+      const existingQuickLink = ctx.store.getters['Files/currentFileOutgoingLinks'].filter(
+        link => link.quicklink || link.name === '__quicklink' || link.name === 'Quicklink'
+      )
+      if (existingQuickLink.length) {
+        copyToClipboard(existingQuickLink.url)
+        await ctx.store.dispatch('showMessage', {
+          title: $gettext('Quicklink copied into your clipboard')
         })
-      }
+      } else {
+        const passwordEnforced =
+          ctx.store.getters.capabilities?.files_sharing?.public?.password?.enforced_for?.read_only ===
+          true
 
-      await createQuicklink({ ...ctx, resource: ctx.item })
+        if (passwordEnforced) {
+          return showQuickLinkPasswordModal(ctx, async (password) => {
+            await createQuicklink({ ...ctx, resource: ctx.item, password })
+            await ctx.store.dispatch('Files/sidebar/openWithPanel', 'sharing-item#linkShares')
+          })
+        }
+
+        await createQuicklink({ ...ctx, resource: ctx.item })
+      }
       await ctx.store.dispatch('Files/sidebar/openWithPanel', 'sharing-item#linkShares')
     },
     displayed: canShare

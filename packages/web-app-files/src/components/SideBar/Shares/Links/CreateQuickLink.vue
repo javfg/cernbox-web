@@ -45,7 +45,7 @@ export default {
     createQuickLink() {
       this.$emit('createPublicLink', {
         link: {
-          name: this.$gettext('Quicklink'),
+          name: '__quicklink',
           permissions: 1,
           expiration: this.expirationDate.enforced ? this.expirationDate.default : null,
           quicklink: true,
