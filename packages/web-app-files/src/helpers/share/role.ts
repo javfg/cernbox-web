@@ -123,21 +123,21 @@ export const peopleRoleViewerFile = new PeopleShareRole(
   false,
   $gettext('Viewer'),
   $gettext('viewer'),
-  [SharePermissions.read, SharePermissions.share]
+  [SharePermissions.read]
 )
 export const peopleRoleViewerFolder = new PeopleShareRole(
   'viewer',
   true,
   $gettext('Viewer'),
   $gettext('viewer'),
-  [SharePermissions.read, SharePermissions.share]
+  [SharePermissions.read]
 )
 export const peopleRoleEditorFile = new PeopleShareRole(
   'editor',
   false,
   $gettext('Editor'),
   $gettext('editor'),
-  [SharePermissions.read, SharePermissions.update, SharePermissions.share]
+  [SharePermissions.read, SharePermissions.update]
 )
 export const peopleRoleEditorFolder = new PeopleShareRole(
   'editor',
@@ -148,8 +148,7 @@ export const peopleRoleEditorFolder = new PeopleShareRole(
     SharePermissions.read,
     SharePermissions.update,
     SharePermissions.create,
-    SharePermissions.delete,
-    SharePermissions.share
+    SharePermissions.delete
   ]
 )
 export const peopleRoleCustomFile = new CustomShareRole(
