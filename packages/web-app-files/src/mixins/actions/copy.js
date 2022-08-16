@@ -4,9 +4,11 @@ import {
   isLocationPublicActive,
   isLocationSpacesActive
 } from '../../router'
+import { mapGetters } from 'vuex'
 
 export default {
   computed: {
+    ...mapGetters(['homeFolder']),
     $_copy_items() {
       return [
         {
@@ -25,6 +27,9 @@ export default {
               return false
             }
             if (resources.length === 0) {
+              return false
+            }
+            if (resources[0].path === this.homeFolder) {
               return false
             }
 
