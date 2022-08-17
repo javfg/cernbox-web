@@ -28,8 +28,6 @@ const { version } = require('./package.json')
 const compilationTimestamp = new Date().getTime()
 
 const config = {
-  requirejs: {},
-  cdn: process.env.CDN === 'true',
   baseUrl: process.env.BASE_URL || '/',
   history_mode: process.env.HISTORY_MODE === 'true'
 }
@@ -158,8 +156,8 @@ const plugins = [
                 css: config.baseUrl + 'css',
                 js: config.baseUrl + 'js'
               },
-              config: config,
-              compilationTimestamp: compilationTimestamp
+              config,
+              compilationTimestamp
             }
           },
           {},
@@ -229,7 +227,7 @@ export default {
   output: {
     dir: 'dist',
     format: 'amd',
-    sourcemap: sourcemap,
+    sourcemap,
     chunkFileNames: path.join('js', 'chunks', production ? '[name]-[hash].js' : '[name].js'),
     entryFileNames: path.join('js', production ? '[name]-[hash].js' : '[name].js')
   },
