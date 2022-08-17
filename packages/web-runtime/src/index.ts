@@ -53,6 +53,7 @@ export const bootstrap = async (configurationPath: string): Promise<void> => {
 
 export const renderSuccess = (): void => {
   const applications = Array.from(applicationStore.values())
+  Vue.config.devtools = process.env.NODE_ENV === 'development'
   const instance = new Vue({
     el: '#owncloud',
     store,
