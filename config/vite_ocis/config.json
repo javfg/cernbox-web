@@ -1,10 +1,10 @@
 {
-  "server": "https://host.docker.internal:9201",
-  "theme": "https://host.docker.internal:9201/themes/owncloud/theme.json",
+  "server": "https://cbox-ocisdev-javier-live.cern.ch",
+  "theme": "https://cbox-ocisdev-javier-live.cern.ch/themes/owncloud/theme.json",
   "openIdConnect": {
-    "metadata_url": "https://host.docker.internal:9200/.well-known/openid-configuration",
-    "authority": "https://host.docker.internal:9200",
-    "client_id": "web",
+    "metadata_url": "https://auth.cern.ch/auth/realms/cern/.well-known/openid-configuration",
+    "authority": "https://auth.cern.ch/auth/realms/cern/",
+    "client_id": "cernbox-service-dev",
     "response_type": "code",
     "scope": "openid profile email"
   },

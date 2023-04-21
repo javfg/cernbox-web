@@ -66,17 +66,13 @@ export default defineConfig(({ mode, command }) => {
     config = {
       ...(!production && {
         server: {
-          port: 9201,
-          https: {
-            key: readFileSync('./dev/docker/ocis-ca/server.key'),
-            cert: readFileSync('./dev/docker/ocis-ca/server.crt')
-          },
+          port: 9100,
           // workaround: https://github.com/owncloud/ocis/issues/5108
           proxy: Object.fromEntries(
             ['api', 'ocs', 'graph', 'remote.php', 'app', 'archiver', 'settings.js'].map((p) => [
               `/${p}`,
               {
-                target: 'https://host.docker.internal:9200',
+                target: 'http://127.0.0.1:9100',
                 secure: false
               }
             ])
@@ -120,7 +116,7 @@ export default defineConfig(({ mode, command }) => {
         target: browserslistToEsbuild()
       },
       server: {
-        host: 'host.docker.internal',
+        host: '127.0.0.1',
         strictPort: true
       },
       css: {
