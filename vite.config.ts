@@ -72,7 +72,7 @@ export default defineConfig(({ mode, command }) => {
             ['api', 'ocs', 'graph', 'remote.php', 'app', 'archiver', 'settings.js'].map((p) => [
               `/${p}`,
               {
-                target: 'http://127.0.0.1:9100',
+                target: 'http://localhost',
                 secure: false
               }
             ])
@@ -116,7 +116,7 @@ export default defineConfig(({ mode, command }) => {
         target: browserslistToEsbuild()
       },
       server: {
-        host: '127.0.0.1',
+        host: '0.0.0.0',
         strictPort: true
       },
       css: {

@@ -1,15 +1,23 @@
 {
-  "server": "https://cbox-ocisdev-javier-live.cern.ch",
-  "theme": "https://cbox-ocisdev-javier-live.cern.ch/themes/owncloud/theme.json",
+  "server": "http://localhost",
+  "theme": "http://localhost/cernbox/theme-cernbox/theme.json",
   "openIdConnect": {
-    "metadata_url": "https://auth.cern.ch/auth/realms/cern/.well-known/openid-configuration",
-    "authority": "https://auth.cern.ch/auth/realms/cern/",
+    "metadata_url": "http://localhost:8080/realms/fakecern/.well-known/openid-configuration",
+    "authority": "http://localhost:8080/realms/fakecern",
     "client_id": "cernbox-service-dev",
     "response_type": "code",
     "scope": "openid profile email"
   },
-  "apps": ["files", "text-editor", "pdf-viewer", "search", "external", "admin-settings"],
+  "apps": [
+    "files",
+    "text-editor",
+    "pdf-viewer",
+    "search",
+    "external",
+    "admin-settings"
+  ],
   "options": {
+    "homeFolder": "/eos/{{.Id}}",
     "previewFileMimeTypes": [
       "image/gif",
       "image/png",
@@ -25,7 +33,11 @@
       "id": "preview",
       "path": "web-app-preview",
       "config": {
-        "mimeTypes": ["image/tiff", "image/bmp", "image/x-ms-bmp"]
+        "mimeTypes": [
+          "image/tiff",
+          "image/bmp",
+          "image/x-ms-bmp"
+        ]
       }
     }
   ]
