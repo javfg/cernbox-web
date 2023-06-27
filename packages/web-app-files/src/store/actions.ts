@@ -257,7 +257,18 @@ export default {
   },
   addShare(
     context,
-    { $gettext, client, path, shareWith, shareType, permissions, role, expirationDate, storageId }
+    {
+      $gettext,
+      client,
+      path,
+      shareWith,
+      shareType,
+      permissions,
+      role,
+      expirationDate,
+      storageId,
+      notify
+    }
   ) {
     const isGroupShare = shareType === ShareTypes.group.value
     const options = {
@@ -265,7 +276,8 @@ export default {
       role: role.name,
       expirationDate,
       spaceRef: storageId,
-      remoteUser: undefined
+      remoteUser: undefined,
+      notify
     }
 
     if (!isGroupShare) {
@@ -311,6 +323,10 @@ export default {
       }
     })
   },
+  notifyShare(_, { client, share }) {
+    return client.shares.notifyShare(share.id)
+  },
+
   /**
    * Prune all branches of the shares tree that are
    * unrelated to the given path
