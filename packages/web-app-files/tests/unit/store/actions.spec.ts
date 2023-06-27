@@ -28,7 +28,8 @@ describe('vuex store actions', () => {
         share: mockDeep<Share>({ shareType: ShareTypes.user.value }),
         permissions: spaceRoleManager.bitmask(false),
         role: spaceRoleManager,
-        expirationDate: null
+        expirationDate: null,
+
       })
 
       expect(stateMock.commit).toHaveBeenCalledTimes(1)
@@ -66,7 +67,8 @@ describe('vuex store actions', () => {
         permissions: spaceRoleManager.bitmask(false),
         role: spaceRoleManager,
         expirationDate: null,
-        storageId: null
+        storageId: null,
+        notify: Boolean,
       })
 
       expect(clientMock.shares[data.shareMethod]).toHaveBeenCalledTimes(1)
@@ -84,7 +86,8 @@ describe('vuex store actions', () => {
         permissions: spaceRoleManager.bitmask(false),
         role: spaceRoleManager,
         expirationDate: null,
-        storageId: null
+        storageId: null,
+        notify: Boolean,
       })
 
       expect(stateMock.commit).toHaveBeenCalledTimes(0)
