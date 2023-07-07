@@ -32,6 +32,7 @@ export class UserManager extends OidcUserManager {
   private store: Store<any>
   private updateAccessTokenPromise: Promise<void> | null
   private _unloadReason: UnloadReason
+  public areEventHandlersRegistered: boolean
 
   constructor(options: UserManagerOptions) {
     const storePrefix = 'oc_oAuth.'

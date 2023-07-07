@@ -4,7 +4,12 @@ import { Store } from 'vuex'
 import { ClientService } from 'web-pkg/src/services'
 import { ConfigurationManager } from 'web-pkg/src/configuration'
 import { RouteLocation, Router } from 'vue-router'
-import { extractPublicLinkToken, isPublicLinkContext, isUserContext } from '../../router'
+import {
+  extractPublicLinkToken,
+  isAnonymousContext,
+  isPublicLinkContext,
+  isUserContext
+} from '../../router'
 import { unref } from 'vue'
 
 export class AuthService {
@@ -15,19 +20,19 @@ export class AuthService {
   private userManager: UserManager
   private publicLinkManager: PublicLinkManager
 
-  public hasAuthErrorOccured: boolean
+  public hasAuthErrorOccurred: boolean
 
   public initialize(
     configurationManager: ConfigurationManager,
     clientService: ClientService,
     store: Store<any>,
-    router: Router
+    router: Router,
   ): void {
     this.configurationManager = configurationManager
     this.clientService = clientService
     this.store = store
     this.router = router
-    this.hasAuthErrorOccured = false
+    this.hasAuthErrorOccurred = false
   }
 
   /**
@@ -63,84 +68,94 @@ export class AuthService {
         configurationManager: this.configurationManager,
         store: this.store
       })
+    }
 
-      this.userManager.events.addAccessTokenExpired((...args): void => {
-        const handleExpirationError = () => {
-          console.error('AccessToken Expired：', ...args)
-          this.handleAuthError(unref(this.router.currentRoute))
-        }
+    if (!isAnonymousContext(this.router, to)) {
 
-        /**
-         * Retry silent token renewal
-         *
-         * in cases where the application runs in the background (different tab, different window) the AccessTokenExpired event gets called
-         * even if the application is still able to obtain a new token.
-         *
-         * The main reason for this is the browser throttling in combination with `oidc-client-ts` 'Timer' class which uses 'setInterval' to notify / refresh all necessary parties.
-         * In those cases the internal clock gets out of sync and the auth library emits that event.
-         *
-         * For a better understanding why this happens and the interval execution gets throttled please read:
-         * https://developer.chrome.com/blog/timer-throttling-in-chrome-88/
-         *
-         * in cases where 'automaticSilentRenew' is enabled we try to obtain a new token one more time before we really start the authError flow.
-         */
-        if (this.userManager.settings.automaticSilentRenew) {
-          this.userManager.signinSilent().catch(handleExpirationError)
-        } else {
-          handleExpirationError()
-        }
-      })
+      if (!this.userManager.areEventHandlersRegistered) {
+        this.userManager.events.addAccessTokenExpired((...args): void => {
+          const handleExpirationError = () => {
+            console.error('AccessToken Expired：', ...args)
+            this.handleAuthError(unref(this.router.currentRoute))
+          }
 
-      this.userManager.events.addAccessTokenExpiring((...args) => {
-        console.debug('AccessToken Expiring：', ...args)
-      })
+          /**
+           * Retry silent token renewal
+           *
+           * in cases where the application runs in the background (different tab, different window) the AccessTokenExpired event gets called
+           * even if the application is still able to obtain a new token.
+           *
+           * The main reason for this is the browser throttling in combination with `oidc-client-ts` 'Timer' class which uses 'setInterval' to notify / refresh all necessary parties.
+           * In those cases the internal clock gets out of sync and the auth library emits that event.
+           *
+           * For a better understanding why this happens and the interval execution gets throttled please read:
+           * https://developer.chrome.com/blog/timer-throttling-in-chrome-88/
+           *
+           * in cases where 'automaticSilentRenew' is enabled we try to obtain a new token one more time before we really start the authError flow.
+           */
+          if (this.userManager.settings.automaticSilentRenew) {
+            this.userManager.signinSilent().catch(handleExpirationError)
+          } else {
+            handleExpirationError()
+          }
+        })
 
-      this.userManager.events.addUserLoaded(async (user) => {
-        console.debug(
-          `New User Loaded. access_token： ${user.access_token}, refresh_token: ${user.refresh_token}`
-        )
+        this.userManager.events.addAccessTokenExpiring((...args) => {
+          console.debug('AccessToken Expiring：', ...args)
+        })
+
+        this.userManager.events.addUserLoaded(async (user) => {
+          console.debug(
+            `New User Loaded. access_token： ${user.access_token}, refresh_token: ${user.refresh_token}`
+          )
+          try {
+            await this.userManager.updateContext(user.access_token)
+          } catch (e) {
+            console.error(e)
+            await this.handleAuthError(unref(this.router.currentRoute))
+          }
+        })
+
+        this.userManager.events.addUserUnloaded(async () => {
+          console.log('user unloaded…')
+          await this.resetStateAfterUserLogout()
+
+          if (this.userManager.unloadReason === 'authError') {
+            this.hasAuthErrorOccurred = true
+            return this.router.push({
+              name: 'accessDenied',
+              query: { redirectUrl: unref(this.router.currentRoute)?.fullPath }
+            })
+          }
+
+          // handle redirect after logout
+          if (this.configurationManager.isOAuth2) {
+            const oAuth2 = this.configurationManager.oAuth2
+            if (oAuth2.logoutUrl) {
+              return (window.location = oAuth2.logoutUrl as any)
+            }
+            return (window.location =
+              `${this.configurationManager.serverUrl}/index.php/logout` as any)
+          }
+        })
+        this.userManager.events.addSilentRenewError(async (error) => {
+          console.error('Silent Renew Error：', error)
+          await this.handleAuthError(unref(this.router.currentRoute))
+        })
+
+        this.userManager.areEventHandlersRegistered = true
+      }
+
+      // relevant for page reload: token is already in userStore
+      // no userLoaded event and no signInCallback gets triggered
+      const accessToken = await this.userManager.getAccessToken()
+      if (accessToken) {
         try {
-          await this.userManager.updateContext(user.access_token)
+          await this.userManager.updateContext(accessToken)
         } catch (e) {
           console.error(e)
           await this.handleAuthError(unref(this.router.currentRoute))
         }
-      })
-
-      this.userManager.events.addUserUnloaded(async () => {
-        console.log('user unloaded…')
-        await this.resetStateAfterUserLogout()
-
-        if (this.userManager.unloadReason === 'authError') {
-          this.hasAuthErrorOccured = true
-          return this.router.push({ name: 'accessDenied' })
-        }
-
-        // handle redirect after logout
-        if (this.configurationManager.isOAuth2) {
-          const oAuth2 = this.configurationManager.oAuth2
-          if (oAuth2.logoutUrl) {
-            return (window.location = oAuth2.logoutUrl as any)
-          }
-          return (window.location =
-            `${this.configurationManager.serverUrl}/index.php/logout` as any)
-        }
-      })
-      this.userManager.events.addSilentRenewError(async (error) => {
-        console.error('Silent Renew Error：', error)
-        await this.handleAuthError(unref(this.router.currentRoute))
-      })
-    }
-
-    // relevant for page reload: token is already in userStore
-    // no userLoaded event and no signInCallback gets triggered
-    const accessToken = await this.userManager.getAccessToken()
-    if (accessToken) {
-      try {
-        await this.userManager.updateContext(accessToken)
-      } catch (e) {
-        console.error(e)
-        await this.handleAuthError(unref(this.router.currentRoute))
       }
     }
   }
@@ -154,18 +169,13 @@ export class AuthService {
    * Sign in callback gets called from the IDP after initial login.
    */
   public async signInCallback() {
-    // craft a url that the parser in oidc-client-ts can handle… this is required for oauth2 logins
-    const url =
-      '/?' +
-      new URLSearchParams(
-        unref(this.router.currentRoute).query as Record<string, string>
-      ).toString()
-
     try {
-      await this.userManager.signinRedirectCallback(url)
-
-      const redirectUrl = this.userManager.getAndClearPostLoginRedirectUrl()
-      return this.router.replace({ path: redirectUrl })
+      await this.userManager.signinRedirectCallback(this.buildSignInCallbackUrl())
+      const redirectRoute = this.router.resolve(this.userManager.getAndClearPostLoginRedirectUrl())
+      return this.router.replace({
+        path: redirectRoute.path,
+        ...(redirectRoute.query && { query: redirectRoute.query })
+      })
     } catch (e) {
       console.warn('error during authentication:', e)
       return this.handleAuthError(unref(this.router.currentRoute))
@@ -180,7 +190,15 @@ export class AuthService {
    * in web.
    */
   public async signInSilentCallback() {
-    await this.userManager.signinSilentCallback()
+    await this.userManager.signinSilentCallback(this.buildSignInCallbackUrl())
+  }
+
+  /**
+   * craft a url that the parser in oidc-client-ts can handle…
+   */
+  private buildSignInCallbackUrl() {
+    const currentQuery = unref(this.router.currentRoute).query
+    return '/?' + new URLSearchParams(currentQuery as Record<string, string>).toString()
   }
 
   public async handleAuthError(route: RouteLocation) {
@@ -195,7 +213,12 @@ export class AuthService {
     }
     if (isUserContext(this.router, route)) {
       await this.userManager.removeUser('authError')
+      return
     }
+    // authGuard is taking care of redirecting the user to the
+    // accessDenied page if hasAuthErrorOccurred is set to true
+    // we can't push the route ourselves, see authGuard for details.
+    this.hasAuthErrorOccurred = true
   }
 
   public async resolvePublicLink(token: string, passwordRequired: boolean, password: string) {
