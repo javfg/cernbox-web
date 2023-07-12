@@ -1,5 +1,6 @@
 <template>
   <nav v-if="userId" :aria-label="$gettext('Account menu')">
+    <NotificationsModal v-show="isModalVisible" @close="closeModal"/>
     <oc-button
       id="_userMenuButton"
       ref="menuButton"
@@ -71,6 +72,14 @@
             />
           </div>
         </li>
+        <li>
+          <oc-button id="oc-topbar-notifications" appearance="raw" @click="showModal">
+            <oc-icon name="notification" fill-type="line" class="oc-p-xs"/>
+            <span class="profile-info-wrapper" :class="{ 'oc-py-xs': !user.email }">
+              <span v-text="$gettext('Notifications Center')" />
+            </span>
+          </oc-button>
+        </li>
       </oc-list>
     </oc-drop>
   </nav>
@@ -83,8 +92,15 @@ import filesize from 'filesize'
 import isNil from 'lodash-es/isNil'
 import { authService } from '../../services/auth'
 import { useCapabilitySpacesEnabled } from 'web-pkg/src/composables'
+import NotificationsModal from './NotificationsModal.vue'
 
 export default defineComponent({
+  components: { NotificationsModal },
+  data() {
+    return {
+      isModalVisible: false,
+    }
+  },
   props: {
     applicationsList: {
       type: Array as PropType<any>,
@@ -168,6 +184,13 @@ export default defineComponent({
   methods: {
     logout() {
       authService.logoutUser()
+    },
+
+    showModal() {
+        this.isModalVisible = true;
+      },
+    closeModal() {
+      this.isModalVisible = false;
     }
   }
 })
