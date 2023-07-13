@@ -1,6 +1,6 @@
 <template>
   <nav v-if="userId" :aria-label="$gettext('Account menu')">
-    <NotificationsModal v-show="isModalVisible" @close="closeModal"/>
+    <NotificationsModal v-show="isModalVisible" @cancel="closeModal"/>
     <oc-button
       id="_userMenuButton"
       ref="menuButton"
@@ -75,9 +75,7 @@
         <li>
           <oc-button id="oc-topbar-notifications" appearance="raw" @click="showModal">
             <oc-icon name="notification" fill-type="line" class="oc-p-xs"/>
-            <span class="profile-info-wrapper" :class="{ 'oc-py-xs': !user.email }">
-              <span v-text="$gettext('Notifications Center')" />
-            </span>
+              <span v-text="$gettext('Notification Settings')"/>
           </oc-button>
         </li>
       </oc-list>
@@ -98,7 +96,7 @@ export default defineComponent({
   components: { NotificationsModal },
   data() {
     return {
-      isModalVisible: false,
+      isModalVisible: true,
     }
   },
   props: {

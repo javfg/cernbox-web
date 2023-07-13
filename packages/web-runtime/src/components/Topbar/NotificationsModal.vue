@@ -1,134 +1,39 @@
-<script>
-  export default {
-    name: 'NotificationsModal',
-    methods: {
-      close() {
-        this.$emit('close');
-      },
-    },
-  };
-</script>
-
 <template>
-  <transition name="modal-fade">
-    <div class="modal-backdrop">
-      <div class="modal"
-        role="dialog"
-        aria-labelledby="modalTitle"
-        aria-describedby="modalDescription"
-      >
-        <header
-          class="modal-header"
-          id="modalTitle"
-        >
-          <slot name="header">
-            Notifications Center
-          </slot>
-          <button
-            type="button"
-            class="btn-close"
-            @click="close"
-            aria-label="Close modal"
-          >
-            x
-          </button>
-        </header>
-
-        <section
-          class="modal-body"
-          id="modalDescription"
-        >
-          
-          <input type="checkbox" id="checkbox" v-model="checked" />
-          <label for="checkbox">Show all notifications.</label>
-        </section>
-
-        <footer class="modal-footer">
-          <button
-            type="button"
-            class="btn-green"
-            @click="close"
-            aria-label="Close modal"
-          >
-            Apply changes and close.
-          </button>
-        </footer>
-      </div>
-    </div>
-  </transition>
-</template>
-
-<style>
-  .modal-backdrop {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .modal {
-    background: #FFFFFF;
-    box-shadow: 2px 2px 20px 1px;
-    overflow-x: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .modal-header,
-  .modal-footer {
-    padding: 15px;
-    display: flex;
-  }
-
-  .modal-header {
-    position: relative;
-    border-bottom: 1px solid #eeeeee;
-    color: #3c7fd0;
-    justify-content: space-between;
-  }
-
-  .modal-footer {
-    border-top: 1px solid #eeeeee;
-    flex-direction: column;
-  }
-
-  .modal-body {
-    position: relative;
-    padding: 20px 10px;
-  }
-
-  .btn-close {
-    position: absolute;
-    top: 0;
-    right: 0;
-    border: none;
-    font-size: 20px;
-    padding: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #3c7fd0;
-    background: transparent;
-  }
-
-  .btn-green {
-    color: white;
-    background: #3c7fd0;
-    border: 1px solid #3c7fd0;
-    border-radius: 2px;
-  }
-
-  .modal-fade-enter,
-  .modal-fade-leave-to {
-    opacity: 0;
-  }
-
-  .modal-fade-enter-active,
-  .modal-fade-leave-active {
-    transition: opacity .5s ease;
-  }
-</style>
+    <oc-modal
+      :title="$gettext('Notification Settings')"
+      :button-cancel-text="$gettext('Discard')"
+      :button-confirm-text="$gettext('Save')"
+      :checkbox-label="$gettext('Disable all notifications')"
+      focus-trap-initial="#create-user-input-display-name"
+      @cancel="$emit('cancel')"
+      @confirm="$emit('confirm')"
+    >
+      <template #content>
+        
+      </template>
+    </oc-modal>
+  </template>
+  
+  <script lang="ts">
+  import { defineComponent } from 'vue'
+  import { useGraphClient } from 'web-pkg'
+  
+  export default defineComponent({
+    name: 'NotificationsModal',
+    emits: ['cancel', 'confirm'],
+    setup() {
+      return {
+        ...useGraphClient()
+      }
+    },
+    data: function () {
+      return {
+      }
+    },
+    computed: {
+    },
+    methods: {
+    }
+  })
+  </script>
+  
