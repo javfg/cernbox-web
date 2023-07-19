@@ -8,11 +8,12 @@
             <oc-resource-icon :resource="resource" size="medium" />
           </oc-td>
           <oc-td
+            v-oc-tooltip="formatVersionDate(item)"
             width="shrink"
             class="oc-text-muted oc-text-nowrap"
             data-testid="file-versions-file-last-modified-date"
           >
-            {{ formatVersionDate(item) }}
+            {{ formatVersionDateRelative(item) }}
           </oc-td>
           <oc-td class="oc-text-muted oc-text-nowrap" data-testid="file-versions-file-size">
             {{ formatVersionFileSize(item) }}
@@ -55,6 +56,7 @@ import { WebDAV } from 'web-client/src/webdav'
 import { defineComponent, inject, ref } from 'vue'
 import { isShareSpaceResource, Resource, SpaceResource } from 'web-client/src/helpers'
 import { SharePermissions } from 'web-client/src/helpers/share'
+import { formatDateFromJSDate } from 'web-pkg/src/helpers'
 
 export default defineComponent({
   name: 'FileVersions',
@@ -127,9 +129,15 @@ export default defineComponent({
       const version = this.currentVersionId(file)
       return this.downloadFile(this.resource, version)
     },
-    formatVersionDate(file) {
+    formatVersionDateRelative(file) {
       return formatRelativeDateFromHTTP(
         file.fileInfo[DavProperty.LastModifiedDate],
+        this.$language.current
+      )
+    },
+    formatVersionDate(file) {
+      return formatDateFromJSDate(
+        new Date(file.fileInfo[DavProperty.LastModifiedDate]),
         this.$language.current
       )
     },
