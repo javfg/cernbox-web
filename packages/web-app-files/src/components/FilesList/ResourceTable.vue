@@ -74,6 +74,7 @@
           v-if="hasRenameAction(item)"
           class="resource-table-edit-name"
           appearance="raw"
+          :aria-label="ariaLabelRename"
           @click="openRenameDialog(item)"
         >
           <oc-icon name="edit-2" fill-type="line" size="small" />
@@ -611,6 +612,9 @@ export default defineComponent({
     },
     hoverableQuickActions() {
       return this.configuration?.options?.hoverableQuickActions
+    },
+    ariaLabelRename() {
+      return this.$gettext("Rename")
     }
   },
   methods: {
