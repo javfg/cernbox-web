@@ -192,7 +192,7 @@ export class UserManager extends OidcUserManager {
     }
 
     const user = await userPromise
-
+    
     this.store.commit('SET_USER', {
       id: login.id,
       uuid: graphUser?.data?.id || '',
@@ -202,7 +202,8 @@ export class UserManager extends OidcUserManager {
       groups: graphUser?.data?.memberOf || userGroups || [],
       isLightweight: ['federated', 'lightweight'].includes(user['user-type']),
       role,
-      language: login?.language
+      language: login?.language,
+      notif: login?.disableNotifications
     })
 
     if (!this.store.getters.capabilities.spaces?.enabled && user.quota) {

@@ -3,36 +3,51 @@
       :title="$gettext('Notification Settings')"
       :button-cancel-text="$gettext('Discard')"
       :button-confirm-text="$gettext('Save')"
-      :checkbox-label="$gettext('Disable all notifications')"
-      focus-trap-initial="#create-user-input-display-name"
       @cancel="$emit('cancel')"
-      @confirm="$emit('confirm')"
+      @confirm="onConfirm"
     >
       <template #content>
-        
+        <oc-checkbox 
+          v-model="localNotifyEnabled" 
+          label="Disable all notifications" 
+        />
       </template>
     </oc-modal>
   </template>
   
   <script lang="ts">
-  import { defineComponent } from 'vue'
+  import { defineComponent, ref, watch, PropType } from 'vue'
   import { useGraphClient } from 'web-pkg'
   
   export default defineComponent({
     name: 'NotificationsModal',
-    emits: ['cancel', 'confirm'],
-    setup() {
+    emits: ['cancel', 'update:initialNotifyEnabled', 'confirm'],
+    props: {
+      initialNotifyEnabled: {
+        type: Boolean as PropType<boolean>,
+        required: true
+      },
+    },
+    setup(props, { emit }) {
+      const localNotifyEnabled = ref(props.initialNotifyEnabled);
+
+      watch(
+        () => props.initialNotifyEnabled,
+        (newVal) => {
+          localNotifyEnabled.value = newVal;
+        }
+      );
+
+      const onConfirm = () => {
+        emit('update:initialNotifyEnabled', localNotifyEnabled.value);
+        emit('confirm', localNotifyEnabled.value);
+      };
+
       return {
+        localNotifyEnabled,
+        onConfirm,
         ...useGraphClient()
-      }
-    },
-    data: function () {
-      return {
-      }
-    },
-    computed: {
-    },
-    methods: {
+      };
     }
   })
   </script>

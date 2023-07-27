@@ -12,7 +12,8 @@ const getInitialState = () => ({
   quota: null,
   language: null,
   role: null,
-  roles: []
+  roles: [],
+  notif: ''
 })
 const state = getInitialState()
 
@@ -29,7 +30,8 @@ const getters = {
   capabilities: (state) => state.capabilities,
   quota: (state) => state.quota,
   user: (state) => state, 
-  language: (state) => state.language
+  language: (state) => state.language,
+  notif: (state) => state.notif
 }
 
 const mutations = {
@@ -49,6 +51,7 @@ const mutations = {
     state.language = user.language
     state.role = user.role
     state.isLightweight = user.isLightweight
+    state.notif = user.notif
     sentrySetUser({ username: user.id })
   },
   SET_CAPABILITIES(state, data) {
@@ -78,6 +81,9 @@ const mutations = {
   },
   SET_LANGUAGE(state, language) {
     state.language = language
+  },
+  SET_NOTIFICATION(state, notif) {
+    state.notif = notif
   }
 }
 
