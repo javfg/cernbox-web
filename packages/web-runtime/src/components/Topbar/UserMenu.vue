@@ -98,7 +98,7 @@
 
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, onMounted } from 'vue'
 import { mapGetters, mapState } from 'vuex'
 import filesize from 'filesize'
 import isNil from 'lodash-es/isNil'
@@ -170,7 +170,7 @@ export default defineComponent({
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(data, 'text/xml');
           const disableNotificationsValue = xmlDoc.querySelector('disableNotifications').textContent;
-          checkboxValue.value = Boolean(disableNotificationsValue)
+          checkboxValue.value = (disableNotificationsValue === 'true');
           return disableNotificationsValue;
       })
       .catch((err) => {
@@ -185,6 +185,10 @@ export default defineComponent({
     const openNotificationsModal = () => {
       notificationsModalOpen.value = true;
     };
+
+    onMounted(() => {
+      getNotificationPreference();
+    });
 
     return {
       checkboxValue,
