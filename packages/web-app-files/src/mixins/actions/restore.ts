@@ -180,10 +180,13 @@ export default {
           createdFolderPaths = existingPaths
         }
 
+        let query = this.$route.params.driveAliasAndItem.startsWith("eos/project")? {"base_path": "/" + this.$route.params.driveAliasAndItem} : ""
+
         try {
           await this.$clientService.webdav.restoreFile(this.space, resource, resource, {
             overwrite: true
-          })
+          },  query
+        )
           restoredResources.push(resource)
         } catch (e) {
           console.error(e)
