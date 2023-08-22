@@ -19,7 +19,7 @@ export default {
       return [
         {
           ...this._deletedFiles_base,
-          isEnabled: this._deletedFiles_enabled_spaces,
+          isEnabled: this._deletedFiles_enabled_spaces
         }
       ]
     },
@@ -27,26 +27,25 @@ export default {
       return [
         {
           ...this._deletedFiles_base,
-          isEnabled: this._deletedFiles_enabled_generic,
+          isEnabled: this._deletedFiles_enabled_generic
         }
       ]
     }
   },
   methods: {
     $_deletedFiles_trigger() {
+      const path =
+        this.$route.name === 'files-spaces-projects'
+          ? '/'
+          : unref(this.$router.currentRoute)?.path?.split('/').filter(Boolean).slice(2).join('/')
       return this.$router.push({
         name: 'files-trash-generic',
         ...createFileRouteOptions(this.space, {
-          path: unref(this.$router.currentRoute)
-            ?.path?.split('/')
-            .filter(Boolean)
-            .slice(2)
-            .join('/')
+          path
         })
       })
     },
     _deletedFiles_enabled_generic({ resources }) {
-
       if (resources.length !== 1) {
         return false
       }
