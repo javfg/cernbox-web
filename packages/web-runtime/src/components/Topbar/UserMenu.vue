@@ -91,7 +91,7 @@
           v-model:initialNotifyEnabled="checkboxValue"
           @cancel="closeNotificationsModal"
           @confirm="updateNotificationPreference"
-      ></notifications-modal>
+      />
     </div>
   </div>
 </template>
@@ -122,60 +122,60 @@ export default defineComponent({
     const store = useStore()
     const accessToken = useAccessToken({ store })
 
-    const updateNotificationPreference = (option) => {
-      const headers = new Headers()
-      headers.append('Authorization', `Bearer ${unref(accessToken)}`)
-      headers.append('X-Requested-With', 'XMLHttpRequest')
-
-      fetch('/ocs/v1.php/cloud/user', {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ disableNotifications: option })
-      })
-        .then((response) => {
-          if (response.ok) {
-            store.commit('SET_NOTIFICATION', option)
-            closeNotificationsModal()
-          } else {
-            throw new Error('Notification setting could not be applied')
-          }
-        })
-        .catch((err) => {
-          store.dispatch('showMessage', {
-            title: 'An error occurred',
-            desc: err || 'Notification setting could not be applied',
-            status: 'danger'
-          })
-        })
-      return
-    }
-
-    const getNotificationPreference = () => {
+    const updateNotificationPreference = async (option) => {
       const headers = new Headers();
       headers.append('Authorization', `Bearer ${unref(accessToken)}`);
       headers.append('X-Requested-With', 'XMLHttpRequest');
 
-      return fetch('/ocs/v1.php/cloud/user', {
-      method: 'GET',
-      headers,
-      })
-      .then((response) => {
-          if (response.ok) {
-              return response.text();
-          } else {
-              throw new Error('Notification setting could not be applied');
-          }
-      })
-      .then((data) => {
+      try {
+        const response = await fetch('/ocs/v1.php/cloud/user', {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ disableNotifications: option }),
+        });
+
+        if (response.ok) {
+          store.commit('SET_NOTIFICATION', option);
+          closeNotificationsModal();
+        } else {
+          throw new Error('Notification setting could not be applied');
+        }
+      } catch (err) {
+        store.dispatch('showMessage', {
+          title: 'An error occurred',
+          desc: err || 'Notification setting could not be applied',
+          status: 'danger',
+        });
+      }
+    };
+
+
+     const getNotificationPreference = async () => {
+      const headers = new Headers();
+      headers.append('Authorization', `Bearer ${unref(accessToken)}`);
+      headers.append('X-Requested-With', 'XMLHttpRequest');
+
+      try {
+        const response = await fetch('/ocs/v1.php/cloud/user', {
+          method: 'GET',
+          headers,
+        });
+
+        if (response.ok) {
+          const data = await response.text();
+
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(data, 'text/xml');
           const disableNotificationsValue = xmlDoc.querySelector('disableNotifications').textContent;
           checkboxValue.value = (disableNotificationsValue === 'true');
+
           return disableNotificationsValue;
-      })
-      .catch((err) => {
-          console.error('An error occurred:', err || 'Notification setting could not be applied');
-      });
+        } else {
+          throw new Error('Notification setting could not be applied');
+        }
+      } catch (err) {
+        console.error('An error occurred:', err || 'Notification setting could not be applied');
+      }
     };
 
     const closeNotificationsModal = () => {
