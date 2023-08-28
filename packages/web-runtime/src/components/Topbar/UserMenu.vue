@@ -117,78 +117,78 @@ export default defineComponent({
     }
   },
   setup() {
-    const checkboxValue = ref(false);
+    const checkboxValue = ref(false)
     const notificationsModalOpen = ref(false)
     const store = useStore()
     const accessToken = useAccessToken({ store })
 
     const updateNotificationPreference = async (option) => {
-      const headers = new Headers();
-      headers.append('Authorization', `Bearer ${unref(accessToken)}`);
-      headers.append('X-Requested-With', 'XMLHttpRequest');
+      const headers = new Headers()
+      headers.append('Authorization', `Bearer ${unref(accessToken)}`)
+      headers.append('X-Requested-With', 'XMLHttpRequest')
 
       try {
         const response = await fetch('/ocs/v1.php/cloud/user', {
           method: 'PATCH',
           headers,
           body: JSON.stringify({ disableNotifications: option }),
-        });
+        })
 
         if (response.ok) {
-          store.commit('SET_NOTIFICATION', option);
-          closeNotificationsModal();
+          store.commit('SET_NOTIFICATION', option)
+          closeNotificationsModal()
         } else {
-          throw new Error('Notification setting could not be applied');
+          throw new Error('Notification setting could not be applied')
         }
       } catch (err) {
         store.dispatch('showMessage', {
           title: 'An error occurred',
           desc: err || 'Notification setting could not be applied',
           status: 'danger',
-        });
+        })
       }
-    };
+    }
 
 
      const getNotificationPreference = async () => {
-      const headers = new Headers();
-      headers.append('Authorization', `Bearer ${unref(accessToken)}`);
-      headers.append('X-Requested-With', 'XMLHttpRequest');
+      const headers = new Headers()
+      headers.append('Authorization', `Bearer ${unref(accessToken)}`)
+      headers.append('X-Requested-With', 'XMLHttpRequest')
 
       try {
         const response = await fetch('/ocs/v1.php/cloud/user', {
           method: 'GET',
           headers,
-        });
+        })
 
         if (response.ok) {
-          const data = await response.text();
+          const data = await response.text()
 
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(data, 'text/xml');
-          const disableNotificationsValue = xmlDoc.querySelector('disableNotifications').textContent;
-          checkboxValue.value = (disableNotificationsValue === 'true');
+          const parser = new DOMParser()
+          const xmlDoc = parser.parseFromString(data, 'text/xml')
+          const disableNotificationsValue = xmlDoc.querySelector('disableNotifications').textContent
+          checkboxValue.value = (disableNotificationsValue === 'true')
 
-          return disableNotificationsValue;
+          return disableNotificationsValue
         } else {
-          throw new Error('Notification setting could not be applied');
+          throw new Error('Notification setting could not be applied')
         }
       } catch (err) {
-        console.error('An error occurred:', err || 'Notification setting could not be applied');
+        console.error('An error occurred:', err || 'Notification setting could not be applied')
       }
-    };
+    }
 
     const closeNotificationsModal = () => {
-      notificationsModalOpen.value = false;
-    };
+      notificationsModalOpen.value = false
+    }
 
     const openNotificationsModal = () => {
-      notificationsModalOpen.value = true;
-    };
+      notificationsModalOpen.value = true
+    }
 
     onMounted(() => {
-      getNotificationPreference();
-    });
+      getNotificationPreference()
+    })
 
     return {
       checkboxValue,

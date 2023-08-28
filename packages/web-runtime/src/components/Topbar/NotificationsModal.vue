@@ -21,25 +21,25 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const localNotifyEnabled = ref(props.initialNotifyEnabled);
+    const localNotifyEnabled = ref(props.initialNotifyEnabled)
 
     watch(
       () => props.initialNotifyEnabled,
       (newVal) => {
-        localNotifyEnabled.value = newVal;
+        localNotifyEnabled.value = newVal
       }
-    );
+    )
 
     const onConfirm = () => {
-      emit('update:initialNotifyEnabled', localNotifyEnabled.value);
-      emit('confirm', localNotifyEnabled.value);
-    };
+      emit('update:initialNotifyEnabled', localNotifyEnabled.value)
+      emit('confirm', localNotifyEnabled.value)
+    }
 
     return {
       localNotifyEnabled,
       onConfirm,
       ...useGraphClient()
-    };
+    }
   }
 })
 </script>
