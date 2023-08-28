@@ -202,7 +202,8 @@ export class UserManager extends OidcUserManager {
       groups: graphUser?.data?.memberOf || userGroups || [],
       isLightweight: ['federated', 'lightweight'].includes(user['user-type']),
       role,
-      language: login?.language
+      language: login?.language,
+      disableNotifications: login?.disableNotifications
     })
 
     if (!this.store.getters.capabilities.spaces?.enabled && user.quota) {

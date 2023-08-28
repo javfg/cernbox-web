@@ -1,5 +1,8 @@
 <template>
-  <nav v-if="userId" :aria-label="$gettext('Account menu')">
+  
+  <div>
+    <nav v-if="userId" :aria-label="$gettext('Account menu')">
+    
     <oc-button
       id="_userMenuButton"
       ref="menuButton"
@@ -71,20 +74,41 @@
             />
           </div>
         </li>
+        <li>
+          
+          <oc-button id="oc-topbar-notifications" appearance="raw" @click="openNotificationsModal">
+            <oc-icon name="notification" fill-type="line" class="oc-p-xs"/>
+              <span v-text="$gettext('Notification Settings')"/>
+          </oc-button>
+        </li>
       </oc-list>
     </oc-drop>
+    
   </nav>
+    <div>
+      <notifications-modal
+          v-if="notificationsModalOpen"
+          v-model:initialNotifyEnabled="checkboxValue"
+          @cancel="closeNotificationsModal"
+          @confirm="updateNotificationPreference"
+      />
+    </div>
+  </div>
 </template>
 
+
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, onMounted } from 'vue'
 import { mapGetters, mapState } from 'vuex'
 import filesize from 'filesize'
 import isNil from 'lodash-es/isNil'
 import { authService } from '../../services/auth'
-import { useCapabilitySpacesEnabled } from 'web-pkg/src/composables'
+import { useCapabilitySpacesEnabled, useStore, useAccessToken } from 'web-pkg/src/composables'
+import NotificationsModal from './NotificationsModal.vue'
+import { ref, unref } from 'vue'
 
 export default defineComponent({
+  components: { NotificationsModal },
   props: {
     applicationsList: {
       type: Array as PropType<any>,
@@ -93,7 +117,86 @@ export default defineComponent({
     }
   },
   setup() {
+    const checkboxValue = ref(false)
+    const notificationsModalOpen = ref(false)
+    const store = useStore()
+    const accessToken = useAccessToken({ store })
+
+    const updateNotificationPreference = async (option) => {
+      const headers = new Headers()
+      headers.append('Authorization', `Bearer ${unref(accessToken)}`)
+      headers.append('X-Requested-With', 'XMLHttpRequest')
+
+      try {
+        const response = await fetch('/ocs/v1.php/cloud/user', {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ disableNotifications: option }),
+        })
+
+        if (response.ok) {
+          store.commit('SET_NOTIFICATION', option)
+          closeNotificationsModal()
+        } else {
+          throw new Error('Notification setting could not be applied')
+        }
+      } catch (err) {
+        store.dispatch('showMessage', {
+          title: 'An error occurred',
+          desc: err || 'Notification setting could not be applied',
+          status: 'danger',
+        })
+      }
+    }
+
+
+     const getNotificationPreference = async () => {
+      const headers = new Headers()
+      headers.append('Authorization', `Bearer ${unref(accessToken)}`)
+      headers.append('X-Requested-With', 'XMLHttpRequest')
+
+      try {
+        const response = await fetch('/ocs/v1.php/cloud/user', {
+          method: 'GET',
+          headers,
+        })
+
+        if (response.ok) {
+          const data = await response.text()
+
+          const parser = new DOMParser()
+          const xmlDoc = parser.parseFromString(data, 'text/xml')
+          const disableNotificationsValue = xmlDoc.querySelector('disableNotifications').textContent
+          checkboxValue.value = (disableNotificationsValue === 'true')
+
+          return disableNotificationsValue
+        } else {
+          throw new Error('Notification setting could not be applied')
+        }
+      } catch (err) {
+        console.error('An error occurred:', err || 'Notification setting could not be applied')
+      }
+    }
+
+    const closeNotificationsModal = () => {
+      notificationsModalOpen.value = false
+    }
+
+    const openNotificationsModal = () => {
+      notificationsModalOpen.value = true
+    }
+
+    onMounted(() => {
+      getNotificationPreference()
+    })
+
     return {
+      checkboxValue,
+      notificationsModalOpen,
+      closeNotificationsModal,
+      openNotificationsModal,
+      updateNotificationPreference,
+      getNotificationPreference,
       hasSpaces: useCapabilitySpacesEnabled()
     }
   },
@@ -168,7 +271,7 @@ export default defineComponent({
   methods: {
     logout() {
       authService.logoutUser()
-    }
+    },
   }
 })
 </script>
