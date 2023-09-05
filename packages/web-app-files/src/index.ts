@@ -95,6 +95,17 @@ const navItems = [
     }
   },
   {
+    name: $gettext('EOS explorer'),
+    icon: 'folder',
+    route: {
+      path: `/${appInfo.id}/spaces/eos`
+    },
+    separate: true,
+    enabled(capabilities) {
+      return true
+    }
+  },
+  {
     name: $gettext('HPC Data'),
     icon: 'folder',
     route: {
