@@ -70,7 +70,7 @@ const navItems = [
     }
   },
   {
-    name: $gettext('Projects'),
+    name: $gettext('EOS projects'),
     icon: 'layout-grid',
     route: {
       path: `/${appInfo.id}/spaces/projects`
@@ -78,6 +78,17 @@ const navItems = [
     activeFor: [{ path: `/${appInfo.id}/spaces/project` }],
     enabled(capabilities) {
       return capabilities.spaces && capabilities.spaces.projects === true
+    }
+  },
+  {
+    name: $gettext('Win spaces'),
+    icon: 'layout-grid',
+    route: {
+      path: `/${appInfo.id}/spaces/cephfs`
+    },
+    activeFor: [{ path: `/${appInfo.id}/spaces/cephfs` }],
+    enabled(capabilities) {
+      return capabilities.group_based?.capabilities?.includes('cephfs-mount') || false
     }
   },
   {
@@ -103,17 +114,6 @@ const navItems = [
     separate: true,
     enabled(capabilities) {
       return true
-    }
-  },
-  {
-    name: $gettext('HPC Data'),
-    icon: 'folder',
-    route: {
-      path: `/${appInfo.id}/spaces/cephfs`
-    },
-    separate: true,
-    enabled(capabilities) {
-      return capabilities.group_based?.capabilities?.includes('cephfs-mount') || false
     }
   }
 ]
