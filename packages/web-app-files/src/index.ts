@@ -84,9 +84,9 @@ const navItems = [
     name: $gettext('Win spaces'),
     icon: 'layout-grid',
     route: {
-      path: `/${appInfo.id}/spaces/cephfs`
+      path: `/${appInfo.id}/spaces/winspaces`
     },
-    activeFor: [{ path: `/${appInfo.id}/spaces/cephfs` }],
+    activeFor: [{ path: `/${appInfo.id}/spaces/winspaces` }],
     enabled(capabilities) {
       return capabilities.group_based?.capabilities?.includes('cephfs-mount') || false
     }
