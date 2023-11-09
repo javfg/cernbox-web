@@ -106,7 +106,7 @@ const navItems = [
     }
   },
   {
-    name: $gettext('Winspaces exporer'),
+    name: $gettext('WinSpaces exporer'),
     icon: 'layout-grid',
     route: {
       path: `/${appInfo.id}/spaces/winspaces`
