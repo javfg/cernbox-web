@@ -78,17 +78,6 @@
           />
         </dd>
       </div>
-      <div class="oc-mb oc-width-1-2@s">
-        <dt v-translate class="oc-text-normal oc-text-muted">Options</dt>
-        <dd data-testid="options">
-          <oc-checkbox
-            v-model="disableExternalClouds"
-            label="Disable external clouds"
-            size="large"
-            @update:model-value="updateExternalClouds"
-          />
-        </dd>
-      </div>
     </dl>
   </main>
 </template>
@@ -143,25 +132,6 @@ export default defineComponent({
         return []
       }
     }).restartable()
-
-    const updateExternalClouds = (option) => {
-      const response = axios.post(
-        '/preferences',
-        {
-          key: 'disable_open_in_app',
-          ns: 'core',
-          value: option
-        },
-        {
-          headers: {
-            authorization: `Bearer ${unref(accessToken)}`,
-            'X-Request-ID': uuidV4(),
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      )
-      // TODO handle errors
-    }
 
     const accountSettingIdentifier = {
       extension: 'ocis-accounts',
@@ -271,7 +241,6 @@ export default defineComponent({
 
     return {
       ...useGraphClient(),
-      updateExternalClouds,
       languageOptions,
       selectedLanguageOption,
       updateSelectedLanguage,
@@ -279,23 +248,18 @@ export default defineComponent({
       isChangePasswordEnabled,
       isLanguageSupported,
       groupNames,
-      user,
-      accessToken
+      user
     }
   },
   data() {
     return {
-      editPasswordModalOpen: false,
-      disableExternalClouds: false
+      editPasswordModalOpen: false
     }
   },
   computed: {
     pageTitle() {
       return this.$gettext(this.$route.meta.title)
     }
-  },
-  async created() {
-    await this.retrieveOptions()
   },
   methods: {
     ...mapActions(['showMessage']),
@@ -321,18 +285,6 @@ export default defineComponent({
             status: 'danger'
           })
         })
-    },
-    async retrieveOptions() {
-      const resp = await axios.get('/preferences?key=disable_open_in_app&ns=core', {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`
-        }
-      })
-      if (resp.status !== 200) {
-        this.disableExternalClouds = false
-      } else {
-        this.disableExternalClouds = resp.data['value'] === "true"
-      }
     }
   }
 })
